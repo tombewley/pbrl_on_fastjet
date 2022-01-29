@@ -1,0 +1,76 @@
+"""
+Run PbRL
+"""
+
+from configparser import DuplicateOptionError
+import sys
+import importlib
+from pprint import pprint
+import gym, fastjet, rlutils
+from rlutils.observers.pbrl import PbrlObserver
+from rlutils.experiments.deploy import SumLogger
+from config.features import F
+from config.params.base import P
+
+def recursive_update(d1, d2, block_overwrite=False, verbose=False):
+    """
+    Items in both d1 and d2. 
+    Adapted from https://stackoverflow.com/a/38504949.
+    """
+    def _recurse(d1, d2, path=[]):
+        typ = None
+        for k in d2:
+            if k in d1:
+                if isinstance(d1[k], dict) and isinstance(d2[k], dict):
+                    _recurse(d1[k], d2[k], path+[k])
+                elif block_overwrite: raise Exception(f"{'.'.join(path+[k])}: {d1[k]} | {d2[k]}")
+                else: d1[k] = d2[k]; typ = "UP "
+            else: d1[k] = d2[k]; typ = "NEW"
+            if verbose and typ is not None: print(f"{typ} {'.'.join(path+[k])}: {d2[k]}")
+    _recurse(d1, d2)
+
+if __name__ == "__main__":
+    P_update = {}
+    for p in sys.argv[1:]:
+        recursive_update(P_update, 
+            importlib.import_module(f"config.params.{p}").P,
+            block_overwrite=True
+            )
+    recursive_update(P, P_update, verbose=True)
+    pprint(P)
+
+    # Sense checks
+    if P["deployment"]["agent"] == "dqn": 
+        P["pbrl"]["discrete_action_map"] = fastjet.env.DISCRETE_ACTION_MAP
+    if P["deployment"]["agent"] == "steve": 
+        assert not P["agent"]["input_normaliser"]
+
+    env = gym.make("FastJet-v0", 
+        task=P["deployment"]["task"], 
+        continuous=(P["deployment"]["agent"] != "dqn"), 
+        skip_frames=P["deployment"]["skip_frames"],
+        render_mode=("human" if "render_freq" in P["deployment"] and P["deployment"]["render_freq"] > 0 else False),
+        camera_angle="target"
+    )
+
+    fname = P["deployment"]["agent_load_fname"]
+    if fname is not None:
+        agent = rlutils.load(f"agents/{fname}.agent", env)
+        agent.start()
+    else:
+        agent = rlutils.make(P["deployment"]["agent"], env=env, 
+                hyperparameters=P["agent"][P["deployment"]["agent"]])
+
+    pbrl = PbrlObserver(P=P["pbrl"], features=F)
+    if P["pbrl"]["reward_source"] != "extrinsic": pbrl.link(agent)    
+
+    rlutils.deploy(agent, P=P["deployment"], train=P["deployment"]["train"],
+        observers={
+            "pbrl": pbrl,
+            "phase_counter": SumLogger({
+                "name": "phase", 
+                "source": "info", 
+                "key": "phase"
+            })
+        }
+    )
