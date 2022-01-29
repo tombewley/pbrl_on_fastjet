@@ -22,7 +22,7 @@ P={
     "episode_time_limit": 500 / SKIP_FRAMES, # Num frames = episode_time_limit * skip_frames
     "skip_frames": SKIP_FRAMES,
     "wandb_monitor": True,
-    "render_freq": 100,
+    "render_freq": 0,
     "checkpoint_freq": 0,
 }
 AP = {
