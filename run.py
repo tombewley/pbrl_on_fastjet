@@ -2,7 +2,6 @@
 Run PbRL
 """
 
-from configparser import DuplicateOptionError
 import sys
 import importlib
 from pprint import pprint
