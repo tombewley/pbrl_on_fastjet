@@ -13,7 +13,7 @@ from config.params.base import P
 
 def recursive_update(d1, d2, block_overwrite=False, verbose=False):
     """
-    Items in both d1 and d2. 
+    Update d1 with items from d2.
     Adapted from https://stackoverflow.com/a/38504949.
     """
     def _recurse(d1, d2, path=[]):
