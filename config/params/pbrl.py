@@ -17,7 +17,6 @@ P = {
         "m_stop_merge": 1, 
         "min_samples_leaf": 1,
         "alpha": 0.005,
-        "save_freq": 1000000, # By ep not n
         "log_freq": 500, # By ep not n      
     }
 }

@@ -8,7 +8,6 @@ P["deployment"] = {
     
     "train": True,
     "agent": "sac",
-    "agent_load_fname": None,
     
     "num_episodes": 100000,
     "episode_time_limit": 500 / SKIP_FRAMES, # Num frames = episode_time_limit * skip_frames
@@ -40,6 +39,5 @@ P["agent"] = {
 }
 
 P["pbrl"] = {
-    "interface": None,
     "reward_source": "extrinsic",  
 }

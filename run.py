@@ -30,13 +30,18 @@ def recursive_update(d1, d2, block_overwrite=False, verbose=False):
 
 if __name__ == "__main__":
     P_update = {}
+
     for p in sys.argv[1:]:
+        try:
+            P_new = importlib.import_module(f"config.params.{p}").P
+        except:
+            P_new = {"deployment": {"agent_load_fname": p}} # If not a recognised config file, treat as filename for loading
         recursive_update(P_update, 
-            importlib.import_module(f"config.params.{p}").P,
+            P_new,
             block_overwrite=True
             )
     recursive_update(P, P_update, verbose=True)
-    pprint(P)
+    # pprint(P)
 
     # Sense checks
     if P["deployment"]["agent"] == "dqn": 
@@ -52,16 +57,17 @@ if __name__ == "__main__":
         camera_angle="target"
     )
 
-    fname = P["deployment"]["agent_load_fname"]
-    if fname is not None:
+    if "agent_load_fname" in P["deployment"]:
+        fname = P['deployment']['agent_load_fname']
         agent = rlutils.load(f"agents/{fname}.agent", env)
-        agent.start()
+        if P["deployment"]["train"]: agent.start()
+        print(f"Loaded {fname}")
     else:
         agent = rlutils.make(P["deployment"]["agent"], env=env, 
                 hyperparameters=P["agent"][P["deployment"]["agent"]])
 
     pbrl = PbrlObserver(P=P["pbrl"], features=F)
-    if P["pbrl"]["reward_source"] != "extrinsic": pbrl.link(agent)    
+    if P["deployment"]["train"] and P["pbrl"]["reward_source"] != "extrinsic": pbrl.link(agent)    
 
     rlutils.deploy(agent, P=P["deployment"], train=P["deployment"]["train"],
         observers={
