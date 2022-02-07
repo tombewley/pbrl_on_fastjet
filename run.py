@@ -11,7 +11,7 @@ from rlutils.experiments.deploy import SumLogger
 from config.features import F
 from config.params.base import P
 
-def recursive_update(d1, d2, block_overwrite=False, verbose=False):
+def recursive_update(d1, d2, i=None, block_overwrite=False, verbose=False):
     """
     Update d1 with items from d2.
     Adapted from https://stackoverflow.com/a/38504949.
@@ -20,28 +20,34 @@ def recursive_update(d1, d2, block_overwrite=False, verbose=False):
         typ = None
         for k in d2:
             if k in d1:
-                if isinstance(d1[k], dict) and isinstance(d2[k], dict):
-                    _recurse(d1[k], d2[k], path+[k])
+                if isinstance(d1[k], dict) and isinstance(d2[k], dict): _recurse(d1[k], d2[k], path+[k])
                 elif block_overwrite: raise Exception(f"{'.'.join(path+[k])}: {d1[k]} | {d2[k]}")
-                else: d1[k] = d2[k]; typ = "UP "
-            else: d1[k] = d2[k]; typ = "NEW"
-            if verbose and typ is not None: print(f"{typ} {'.'.join(path+[k])}: {d2[k]}")
+                else: typ = "UP "
+            else: typ = "NEW"
+            if typ is not None: 
+                if i is not None and type(d2[k]) == list: d1[k] = d2[k][i]
+                else: d1[k] = d2[k]
+                if verbose: print(f"{typ} {'.'.join(path+[k])}: {d1[k]}")
     _recurse(d1, d2)
 
 if __name__ == "__main__":
     P_update = {}
 
     for p in sys.argv[1:]:
+        i = None
         try:
+            if "=" in p: p, i = p.split("="); i = int(i) # For parameter array
+            print(p, i)
             P_new = importlib.import_module(f"config.params.{p}").P
         except:
             P_new = {"deployment": {"agent_load_fname": p}} # If not a recognised config file, treat as filename for loading
         recursive_update(P_update, 
             P_new,
+            i=i,
             block_overwrite=True
             )
     recursive_update(P, P_update, verbose=True)
-    # pprint(P)
+    pprint(P)
 
     # Sense checks
     if P["deployment"]["agent"] == "dqn": 

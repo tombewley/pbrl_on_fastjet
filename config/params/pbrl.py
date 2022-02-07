@@ -2,9 +2,10 @@ P = {
     "pbrl": {
         "reward_source": "tree",  
         # "feedback_budget": 10000, # Disable for sweep.
-        "observe_freq": 50, 
-        "feedback_freq": 500, # By ep not n
-        "num_episodes_before_freeze": 50000, 
+        # "observe_freq": 50, 
+        # "feedback_freq": 500, # By ep not n
+        # "log_freq": 500, # By ep not n      
+        # "num_episodes_before_freeze": 50000, 
         "scheduling_coef": 0,
         "sampling": {
             "weight": "ucb", 
@@ -17,6 +18,5 @@ P = {
         "m_stop_merge": 1, 
         "min_samples_leaf": 1,
         "alpha": 0.005,
-        "log_freq": 500, # By ep not n      
     }
 }
