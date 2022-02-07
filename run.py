@@ -17,8 +17,8 @@ def recursive_update(d1, d2, i=None, block_overwrite=False, verbose=False):
     Adapted from https://stackoverflow.com/a/38504949.
     """
     def _recurse(d1, d2, path=[]):
-        typ = None
         for k in d2:
+            typ = None
             if k in d1:
                 if isinstance(d1[k], dict) and isinstance(d2[k], dict): _recurse(d1[k], d2[k], path+[k])
                 elif block_overwrite: raise Exception(f"{'.'.join(path+[k])}: {d1[k]} | {d2[k]}")
@@ -37,14 +37,14 @@ if __name__ == "__main__":
         i = None
         try:
             if "=" in p: p, i = p.split("="); i = int(i) # For parameter array
-            print(p, i)
             P_new = importlib.import_module(f"config.params.{p}").P
         except:
             P_new = {"deployment": {"agent_load_fname": p}} # If not a recognised config file, treat as filename for loading
         recursive_update(P_update, 
             P_new,
             i=i,
-            block_overwrite=True
+            block_overwrite=True,
+            verbose=False
             )
     recursive_update(P, P_update, verbose=True)
     pprint(P)
