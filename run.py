@@ -60,7 +60,7 @@ if __name__ == "__main__":
         continuous=(P["deployment"]["agent"] != "dqn"), 
         skip_frames=P["deployment"]["skip_frames"],
         render_mode=("human" if "render_freq" in P["deployment"] and P["deployment"]["render_freq"] > 0 else False),
-        camera_angle="target"
+        camera_angle="bbox"
     )
 
     if "agent_load_fname" in P["deployment"]:

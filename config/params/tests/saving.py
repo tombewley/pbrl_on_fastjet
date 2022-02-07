@@ -8,6 +8,6 @@ P={
         "feedback_freq": 500, 
         "log_freq": 500,      
         "num_episodes_before_freeze": 50000, 
-        "save_freq": 25000
+        "save_freq": 1000
     }
 }
