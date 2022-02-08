@@ -6,7 +6,7 @@ P = {
         # "feedback_freq": 500, # By ep not n
         # "log_freq": 500, # By ep not n      
         # "num_episodes_before_freeze": 50000, 
-        "scheduling_coef": 0,
+        # "scheduling_coef": 0,
         "sampling": {
             "weight": "ucb", 
             "constrained": True, 
