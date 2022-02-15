@@ -17,18 +17,15 @@ with left:
 
 with right:
     st.write(pd.DataFrame({
-        'first column': [1, 2, 3, 4],
-        'second column': [10, 20, 30, 40]
+        "first column": [1, 2, 3, 4],
+        "second column": [10, 20, 30, 40]
     }))
 
     x = st.slider('x')  # 👈 this is a widget
-    st.write(x, 'squared is', x * x)
+    st.write(f"Hi {st.session_state.name}! {x} squared is {x * x}")
 
 chart_data = pd.DataFrame(
     np.array([[0,x,x],[x,0,x]]),
     columns=['a', 'b', 'c'])
 
 st.line_chart(chart_data)
-
-# You can access the value at any point with:
-print(st.session_state.name)
