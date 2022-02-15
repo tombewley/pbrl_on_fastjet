@@ -31,6 +31,7 @@ P["agent"] = {
     "dqn": {
         "net_Q": [(None, 256), "R", (256, 128), "R", (128, 64), "R", (64, None)],
         "input_normaliser": "***TODO***",
+        "gamma": "***TODO***", 
         "replay_capacity": 5e5,
         "batch_size": 256,
         "lr_Q": 1e-3,
