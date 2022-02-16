@@ -11,6 +11,8 @@ from rlutils.experiments.deploy import SumLogger
 from config.features import F
 from config.params.base import P
 
+# TODO: Wheel reinvention here! Use wandb.config
+
 def recursive_update(d1, d2, i=None, block_overwrite=False, verbose=False):
     """
     Update d1 with items from d2.
