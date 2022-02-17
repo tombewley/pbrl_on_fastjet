@@ -23,7 +23,7 @@ P["agent"] = {
         "batch_size": 32, 
         "lr_pi": 1e-4, 
         "lr_Q": 1e-3,
-        "gamma": 0.75, 
+        "gamma": 0.99, 
         "alpha": 0.2, 
         "tau": 0.005, 
         "update_freq": 1, 
