@@ -3,6 +3,9 @@ from ..oracles import *
 
 P = {
     "pbrl": {
-        "interface": (OracleInterface, target_pose_tree),
+        "interface": {
+            "kind": OracleInterface, 
+            "oracle": target_pose_tree,
+        },
     }
 }
