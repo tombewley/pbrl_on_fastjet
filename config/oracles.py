@@ -5,18 +5,18 @@ def target_pose_linear(tr):
     """
     Linear function of angular and positional deviation from target pose.
     """
-    return - (F["fwd_error"](tr) + F["right_error"](tr) + 0.01*F["dist"](tr)).sum()
+    return - (F["fwd_error"](tr) + F["up_error"](tr) + 0.01*F["dist"](tr)).sum()
 
 def target_pose_tree(tr):
-    def reward(d, d_d, f, r):
+    def reward(d, d_d, f, u):
         constant = -1.
         reward_d   = 0. if d < 20      else (-1. if d < 50      else -2.) 
         reward_d_d = 0. if d_d < 0     else -1.
         reward_f   = 0. if f < np.pi/4 else (-1. if f < np.pi/2 else -2.)
-        reward_r   = 0. if r < np.pi/4 else (-1. if r < np.pi/2 else -2.)
-        return constant + reward_d + reward_d_d + reward_f + reward_r
-    return [reward(d, d_d, f, r) for d, d_d, f, r in zip(
-            F["dist"](tr), F["delta_dist"](tr), F["fwd_error"](tr), F["right_error"](tr))]
+        reward_u   = 0. if u < np.pi/4 else (-1. if u < np.pi/2 else -2.)
+        return constant + reward_d + reward_d_d + reward_f + reward_u
+    return [reward(d, d_d, f, u) for d, d_d, f, u in zip(
+            F["dist"](tr), F["delta_dist"](tr), F["fwd_error"](tr), F["up_error"](tr))]
     
 if False: # TODO: generic function to visualise 2D reward
     import numpy as np

@@ -48,7 +48,7 @@ G_VEC = np.array([0,9.81,0])
 # NOTE: Makes more sense to evaluate performance w.r.t. *previous* target
 F = {}
 F["dist"]              = lambda t: np.linalg.norm(t[:,41:44] - t[:,19:22], axis=1)
-F["delta_dist"]        = lambda t: F["dist"](t) - np.linalg.norm(t[:,0:3] - t[:,19:22], axis=1)
+F["closing_speed"]     = lambda t: F["dist"](t) - np.linalg.norm(t[:,0:3] - t[:,19:22], axis=1)
 F["alt"]               = lambda t: t[:,42]
 F["target_alt"]        = lambda t: t[:,20]
 F["alt_error"]         = lambda t: np.abs(F["alt"](t) - F["target_alt"](t))
