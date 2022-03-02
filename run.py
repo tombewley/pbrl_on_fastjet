@@ -75,7 +75,7 @@ if __name__ == "__main__":
                 hyperparameters=P["agent"][P["deployment"]["agent"]])
 
     pbrl = PbrlObserver(P=P["pbrl"], features=F)
-    if P["deployment"]["train"] and P["pbrl"]["reward_source"] != "extrinsic": pbrl.link(agent)    
+    if P["deployment"]["train"] and P["pbrl"]["reward_model"] != "extrinsic": pbrl.link(agent)    
 
     rlutils.deploy(agent, P=P["deployment"], train=P["deployment"]["train"],
         observers={

@@ -7,6 +7,6 @@ P = {
             "kind": OracleInterface, 
             "oracle": target_pose_tree,
         },
-        "reward_source": "oracle"
+        "reward_model": "oracle"
     }
 }

@@ -11,7 +11,7 @@ def target_pose_tree(tr):
     def reward(d, v, f, u):
         constant = -1.
         reward_d   = 0. if d < 20      else (-1. if d < 50      else -2.) 
-        reward_v = 0. if v < 0     else -1.
+        reward_v   = 0. if v < 0       else -1.
         reward_f   = 0. if f < np.pi/4 else (-1. if f < np.pi/2 else -2.)
         reward_u   = 0. if u < np.pi/4 else (-1. if u < np.pi/2 else -2.)
         return constant + reward_d + reward_v + reward_f + reward_u

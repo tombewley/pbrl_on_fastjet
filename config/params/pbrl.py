@@ -1,6 +1,6 @@
 P = {
     "pbrl": {
-        "reward_source": "tree",  
+        "reward_model": "tree",  
         # "feedback_budget": 10000, # Disable for sweep.
         # "observe_freq": 50, 
         # "feedback_freq": 500, # By ep not n

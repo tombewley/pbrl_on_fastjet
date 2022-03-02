@@ -40,5 +40,5 @@ P["agent"] = {
 }
 
 P["pbrl"] = {
-    "reward_source": "extrinsic",  
+    "reward_model": "extrinsic",  
 }
