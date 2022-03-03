@@ -1,4 +1,4 @@
-import numpy as np
+from numpy import pi
 from .features import F
 
 def target_pose_linear(tr): 
@@ -12,19 +12,19 @@ def target_pose_tree(tr):
         constant = -1.
         reward_d   = 0. if d < 20      else (-1. if d < 50      else -2.) 
         reward_v   = 0. if v < 0       else -1.
-        reward_f   = 0. if f < np.pi/4 else (-1. if f < np.pi/2 else -2.)
-        reward_u   = 0. if u < np.pi/4 else (-1. if u < np.pi/2 else -2.)
+        reward_f   = 0. if f < pi/4 else (-1. if f < pi/2 else -2.)
+        reward_u   = 0. if u < pi/4 else (-1. if u < pi/2 else -2.)
         return constant + reward_d + reward_v + reward_f + reward_u
     return [reward(d, v, f, u) for d, v, f, u in zip(
             F["dist"](tr), F["closing_speed"](tr), F["fwd_error"](tr), F["up_error"](tr))]
     
 if False: # TODO: generic function to visualise 2D reward
-    import numpy as np
+    from numpy import zeros
     import matplotlib.pyplot as plt
-    lims = (425, np.pi)
+    lims = (425, pi)
     RES = 100
     dx, dy = lims[0]/RES, lims[1]/RES
-    r = np.zeros((RES, RES))
+    r = zeros((RES, RES))
     for x in range(RES):
         for y in range(RES):
             r[x, y] = - (0.01*x*dx + y*dy)

@@ -11,7 +11,7 @@ P = {
             "weight": "ucb", 
             "constrained": True, 
             "probabilistic": True, # NOTE: Very early indication that this may be better.
-            "num_std": 2
+            "num_std": 0 # NOTE: <<<<
             },
         "p_clip": 0.1,
         "m_max": 100,
