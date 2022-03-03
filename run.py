@@ -5,8 +5,8 @@ Script for running preference-based reinforcement learning
 import sys
 import importlib
 from pprint import pprint
-import numpy as np
-np.set_printoptions(precision=3, suppress=True, edgeitems=30, linewidth=100000)   
+import torch
+torch.set_printoptions(precision=3, linewidth=100000)   
 import gym
 
 import fastjet
