@@ -43,7 +43,8 @@
 40 | --  | demanded_thrust
 """
 import torch
-G_VEC = torch.tensor([0,9.81,0])
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+G_VEC = torch.tensor([0,9.81,0], device=device)
 
 # NOTE: Makes more sense to evaluate performance w.r.t. *previous* target
 F = {}
