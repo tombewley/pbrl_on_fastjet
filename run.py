@@ -1,23 +1,26 @@
 """
-Run PbRL
+Script for running preference-based reinforcement learning
 """
 
 import sys
 import importlib
 from pprint import pprint
-import gym, fastjet, rlutils
+import numpy as np
+np.set_printoptions(precision=3, suppress=True, edgeitems=30, linewidth=100000)   
+import gym
+
+import fastjet
+import rlutils
 from rlutils.observers.pbrl import PbrlObserver
 from rlutils.experiments.deploy import SumLogger
+
 from config.features import F
 from config.params.base import P
 
-# TODO: Wheel reinvention here! Use wandb.config
 
 def recursive_update(d1, d2, i=None, block_overwrite=False, verbose=False):
-    """
-    Update d1 with items from d2.
-    Adapted from https://stackoverflow.com/a/38504949.
-    """
+    # Adapted from https://stackoverflow.com/a/38504949.
+    # TODO: Wheel reinvention here! Use wandb.config
     def _recurse(d1, d2, path=[]):
         for k in d2:
             typ = None
@@ -38,10 +41,11 @@ if __name__ == "__main__":
     for p in sys.argv[1:]:
         i = None
         try:
-            if "=" in p: p, i = p.split("="); i = int(i) # For parameter array
+            if "=" in p: # For parameter array
+                p, i = p.split("="); i = int(i) 
             P_new = importlib.import_module(f"config.params.{p}").P
-        except:
-            P_new = {"deployment": {"agent_load_fname": p}} # If not a recognised config file, treat as filename for loading
+        except: # If not a recognised config file, treat as filename for loading
+            P_new = {"deployment": {"agent_load_fname": p}} 
         recursive_update(P_update, 
             P_new,
             i=i,
@@ -61,7 +65,8 @@ if __name__ == "__main__":
         task=P["deployment"]["task"], 
         continuous=(P["deployment"]["agent"] != "dqn"), 
         skip_frames=P["deployment"]["skip_frames"],
-        render_mode=("human" if "render_freq" in P["deployment"] and P["deployment"]["render_freq"] > 0 else False),
+        render_mode=("human" if "render_freq" in P["deployment"] 
+                     and P["deployment"]["render_freq"] > 0 else False),
         camera_angle="outside_target_bg"
     )
 
@@ -75,7 +80,7 @@ if __name__ == "__main__":
                 hyperparameters=P["agent"][P["deployment"]["agent"]])
 
     pbrl = PbrlObserver(P=P["pbrl"], features=F)
-    if P["deployment"]["train"] and P["pbrl"]["reward_model"] != "extrinsic": pbrl.link(agent)    
+    if P["deployment"]["train"] and P["pbrl"]["reward_source"] != "extrinsic": pbrl.link(agent)    
 
     rlutils.deploy(agent, P=P["deployment"], train=P["deployment"]["train"],
         observers={
