@@ -4,6 +4,6 @@ PilotData/
 agents/
 demos/
 observations/
-run_logs/
+logs/
 wandb/
 experiments/
