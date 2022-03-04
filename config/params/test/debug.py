@@ -7,6 +7,7 @@ P = {
         "scheduling_coef": 0,
         "observe_freq": 1,
         "feedback_freq": 2,
+        "log_freq": 0,
         "num_episodes_before_freeze": 40
     }
 }

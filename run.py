@@ -12,7 +12,7 @@ import gym
 import fastjet
 import rlutils
 from rlutils.observers.pbrl import PbrlObserver
-from rlutils.experiments.deploy import SumLogger
+from rlutils.observers.sum_logger import SumLogger
 
 from config.features import F
 from config.params.base import P
@@ -44,7 +44,7 @@ if __name__ == "__main__":
             if "=" in p: # For parameter array
                 p, i = p.split("="); i = int(i) 
             P_new = importlib.import_module(f"config.params.{p}").P
-        except: # If not a recognised config file, treat as filename for loading
+        except ImportError: # If not a recognised config file, treat as filename for loading
             P_new = {"deployment": {"agent_load_fname": p}} 
         recursive_update(P_update, 
             P_new,

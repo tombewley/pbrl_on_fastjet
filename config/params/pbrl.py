@@ -1,4 +1,4 @@
-from rlutils.observers.models import RewardTree
+from rlutils.observers.pbrl.models import RewardTree
 
 P = {
     "pbrl": {

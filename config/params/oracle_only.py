@@ -1,4 +1,4 @@
-from rlutils.observers.interfaces import OracleInterface
+from rlutils.observers.pbrl.interfaces import OracleInterface
 from ..oracles import *
 
 P = {
