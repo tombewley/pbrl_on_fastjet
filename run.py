@@ -37,7 +37,6 @@ def recursive_update(d1, d2, i=None, block_overwrite=False, verbose=False):
 
 if __name__ == "__main__":
     P_update = {}
-
     for p in sys.argv[1:]:
         i = None
         try:

@@ -4,6 +4,7 @@ P = {
     "pbrl": {
         "interface": {
             "kind": FastJetInterface
-        }
+        },
+        "reward_source": "model"
     }
 }

@@ -5,7 +5,8 @@ P = {
     "pbrl": {
         "interface": {
             "kind": OracleInterface, 
-            "oracle": target_pose_tree,
+            "oracle": target_pose_tree
         },
+        "reward_source": "model"
     }
 }

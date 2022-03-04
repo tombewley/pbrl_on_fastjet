@@ -1,4 +1,5 @@
-P = {"deployment": {
-    "task": "follow_no_reward"
+P = {
+    "deployment": {
+        "task": "follow_no_reward"
     }
 }

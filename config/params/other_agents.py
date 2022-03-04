@@ -1,4 +1,5 @@
-P = {"agent": {
+P = {
+    "agent": {
         "sac": { # Ian's settings
             "net_pi": [(None, 512), "R", (512, 512), "R", (512, 256), "R", (256, None)],
             "net_Q": [(None, 512), "R", (512, 512), "R", (512, 256), "R", (256, None)],
@@ -21,6 +22,15 @@ P = {"agent": {
             "horizon": 5, 
             "ddpg_parameters": {"td3": True},
             "nonfixed_dim": 19 # NOTE: First 19 dimensions vary over an episode
+        },
+        "dqn": {
+            "net_Q": [(None, 256), "R", (256, 128), "R", (128, 64), "R", (64, None)],
+            "input_normaliser": "***TODO***",
+            "gamma": "***TODO***", 
+            "replay_capacity": 5e5,
+            "batch_size": 256,
+            "lr_Q": 1e-3,
+            "epsilon_decay": "***TODO***" # P["deployment"]["num_episodes"]*P["deployment"]["episode_time_limit"],
         }
     }
 }

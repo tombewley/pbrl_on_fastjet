@@ -1,6 +1,6 @@
-P={}
-
-P["deployment"] = {    
-    "train": False,
-    "render_freq": 1,
+P = {
+    "deployment": { 
+        "train": False,
+        "render_freq": 1
+    }
 }
