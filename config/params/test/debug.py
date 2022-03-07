@@ -14,13 +14,13 @@ P = {
             "probabilistic": True, 
             "num_std": 0 # NOTE: <<<<
         },
-        "logger": {
-            "freq": 2,
-            "plots": {
-                "tree_rectangles": {
-                    (((2, 3), None))
-                }
-            }
-        }
+        # "logger": {
+        #     "freq": 2,
+        #     "plots": {
+        #         "tree_rectangles": {
+        #             (((2, 3), None))
+        #         }
+        #     }
+        # }
     }
 }
