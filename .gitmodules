@@ -1,3 +1,9 @@
 [submodule "rlutils"]
 	path = rlutils
 	url = https://github.com/tombewley/rlutils
+[submodule "fastjet"]
+	path = fastjet
+	url = https://github.com/tombewley/fastjet
+[submodule "hyperrectangles"]
+	path = hyperrectangles
+	url = https://github.com/tombewley/hyperrectangles
