@@ -10,6 +10,6 @@ P = {
             "min_samples_leaf": 1,
             "alpha": 0.001,
         },
-        # "feedback_freq": 500 
+        "feedback_freq": 500 
     }
 }
