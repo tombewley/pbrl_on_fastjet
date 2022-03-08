@@ -2,8 +2,7 @@ SKIP_FRAMES = 25
 
 P = {
     "deployment": {
-        "project_name": "fastjet",
-        "task": "target_no_reward",
+        "task": "target",
         "train": True,
         "agent": "sac",
         "num_episodes": 100000,

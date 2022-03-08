@@ -52,6 +52,8 @@ if __name__ == "__main__":
             verbose=False
             )
     recursive_update(P, P_update, verbose=True)
+    P["deployment"]["project_name"] = "fastjet-" + P["deployment"]["task"]
+
     pprint(P)
 
     # Sense checks
@@ -70,7 +72,7 @@ if __name__ == "__main__":
     )
 
     if "agent_load_fname" in P["deployment"]:
-        fname = P['deployment']['agent_load_fname']
+        fname = P["deployment"]["agent_load_fname"]
         agent = rlutils.load(f"agents/{fname}.agent", env)
         if P["deployment"]["train"]: agent.start()
         print(f"Loaded {fname}")
