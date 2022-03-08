@@ -6,4 +6,5 @@ demos/
 observations/
 logs/
 wandb/
+video/
 experiments/
