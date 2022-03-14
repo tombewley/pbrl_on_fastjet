@@ -17,9 +17,7 @@ P = {
         # "logger": {
         #     "freq": 2,
         #     "plots": {
-        #         "tree_rectangles": {
-        #             (((2, 3), None))
-        #         }
+        #         "tree_loss_vs_m"
         #     }
         # }
     }
