@@ -1,8 +1,8 @@
 from vpython import canvas, label, slider, vector
 import numpy as np
 from scipy.interpolate import interp1d
-from .env import FastJetEnv
-from .fast_jet import dir_to_vec, vec_to_dir
+from fastjet.env import FastJetEnv
+from fastjet.fast_jet import dir_to_vec, vec_to_dir
 
 
 STATE_DIM = 37
@@ -15,7 +15,8 @@ class FastJetInterface():
     def __enter__(self):
         self.envs = []
         for e in range(2):
-            self.envs.append(FastJetEnv(task="target_no_reward", camera_angle="bbox"))
+            self.envs.append(FastJetEnv(task="target", camera_angle="bbox"))
+            self.envs[e].jets[0].arrow_length = 20
             self.envs[e].render_mode = "human"
             self.envs[e].reset()
             self.envs[e].render(scene=canvas(width=900, height=600, align="right" if e == 0 else None))
@@ -92,8 +93,8 @@ class FastJetInterface():
             elif self.last_key == " ": return (1 - self.slider.value) 
 
     def keydown(self, ev): 
-        if ev.key == "left": self.slider.value = max(0, self.slider.value - 0.05)
-        elif ev.key == "right": self.slider.value = min(1, self.slider.value + 0.05)
+        if ev.key == "left": self.slider.value = max(0, self.slider.value - 0.5)
+        elif ev.key == "right": self.slider.value = min(1, self.slider.value + 0.5)
         self.last_key = ev.key
 
 
