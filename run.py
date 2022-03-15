@@ -43,12 +43,12 @@ if __name__ == "__main__":
     P_update = {}
     for p in sys.argv[1:]:
         i = None
-        # try:
-        if "=" in p: # For parameter array
-            p, i = p.split("="); i = int(i) 
-        P_new = importlib.import_module(f"config.params.{p}").P
-        # except ImportError: # If not a recognised config file, treat as filename for loading
-            # P_new = {"deployment": {"agent_load_fname": p}} 
+        try:
+            if "=" in p: # For parameter array
+                p, i = p.split("="); i = int(i) 
+            P_new = importlib.import_module(f"config.params.{p}").P
+        except ImportError: # If not a recognised config file, treat as filename for loading
+            P_new = {"deployment": {"agent_load_fname": p}} 
         recursive_update(P_update, 
             P_new,
             i=i,
