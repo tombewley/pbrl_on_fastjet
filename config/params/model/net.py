@@ -9,5 +9,6 @@ P = {
             "batch_size": 32
         },
         "feedback_freq": 100
-    }
+    },
+    "reward_source": "model"
 }

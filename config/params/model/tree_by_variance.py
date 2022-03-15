@@ -4,7 +4,7 @@ P = {
     "pbrl": {
         "model": {
             "kind": RewardTree,
-            "split_by_variance": False,
+            "split_by_variance": True,
             "p_clip": 0.1,
             "m_max": 100,
             "num_from_queue": float("inf"), # NOTE: <<<
@@ -13,5 +13,6 @@ P = {
             "alpha": 0.001,
         },
         "feedback_freq": 500
-    }
+    },
+    "reward_source": "model"
 }

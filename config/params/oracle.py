@@ -5,8 +5,11 @@ P = {
     "pbrl": {
         "interface": {
             "kind": OracleInterface, 
-            "oracle": target_pose_tree
+            "oracle": [
+                target_pose_tree,       # 0
+                target_pose_linear,     # 1
+                negative_dist_to_target # 2
+            ]
         },
-        "reward_source": "model"
     }
 }

@@ -21,19 +21,23 @@ from config.params.base import P
 def recursive_update(d1, d2, i=None, block_overwrite=False, verbose=False):
     # Adapted from https://stackoverflow.com/a/38504949.
     # TODO: Wheel reinvention here! Use wandb.config
-    def _recurse(d1, d2, path=[]):
+    def _update(d1, d2, path=[]):
         for k in d2:
             typ = None
             if k in d1:
-                if isinstance(d1[k], dict) and isinstance(d2[k], dict): _recurse(d1[k], d2[k], path+[k])
+                if isinstance(d1[k], dict) and isinstance(d2[k], dict): _update(d1[k], d2[k], path+[k])
                 elif block_overwrite: raise Exception(f"{'.'.join(path+[k])}: {d1[k]} | {d2[k]}")
                 else: typ = "UP "
             else: typ = "NEW"
             if typ is not None: 
-                if i is not None and type(d2[k]) == list: d1[k] = d2[k][i]
-                else: d1[k] = d2[k]
+                d1[k] = d2[k]
                 if verbose: print(f"{typ} {'.'.join(path+[k])}: {d1[k]}")
-    _recurse(d1, d2)
+    def _select_index(d1):
+        for k in d1: 
+            if isinstance(d1[k], dict): _select_index(d1[k])
+            elif isinstance(d1[k], list): d1[k] = d1[k][i]
+    _update(d1, d2)
+    if i is not None: _select_index(d1)
 
 if __name__ == "__main__":
     P_update = {}

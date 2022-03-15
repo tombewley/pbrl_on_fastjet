@@ -1,11 +1,6 @@
 from numpy import pi
+from torch import tensor
 from .features import F
-
-def target_pose_linear(tr): 
-    """
-    Linear function of angular and positional deviation from target pose.
-    """
-    return - (F["fwd_error"](tr) + F["up_error"](tr) + 0.01*F["dist"](tr)).sum()
 
 def target_pose_tree(tr):
     def reward(d, v, f, u):
@@ -15,9 +10,19 @@ def target_pose_tree(tr):
         reward_f   = 0. if f < pi/4 else (-1. if f < pi/2 else -2.)
         reward_u   = 0. if u < pi/4 else (-1. if u < pi/2 else -2.)
         return constant + reward_d + reward_v + reward_f + reward_u
-    return [reward(d, v, f, u) for d, v, f, u in zip(
-            F["dist"](tr), F["closing_speed"](tr), F["fwd_error"](tr), F["up_error"](tr))]
+    return tensor([reward(d, v, f, u) for d, v, f, u in zip(
+           F["dist"](tr), F["closing_speed"](tr), F["fwd_error"](tr), F["up_error"](tr))],
+           device=tr.device)
+
+def target_pose_linear(tr): 
+    """
+    Linear function of angular and positional deviation from target pose.
+    """
+    return - (F["fwd_error"](tr) + F["up_error"](tr) + 0.01*F["dist"](tr))
     
+def negative_dist_to_target(tr):
+    return -F["dist"](tr)
+
 if False: # TODO: generic function to visualise 2D reward
     from numpy import zeros
     import matplotlib.pyplot as plt
