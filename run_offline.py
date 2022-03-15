@@ -1,7 +1,7 @@
 from rlutils.observers.pbrl import load
 from rlutils.observers.pbrl.models import RewardNet, RewardTree
 from rlutils.observers.pbrl.interfaces import OracleInterface
-from fastjet.interface import FastJetInterface
+from config.interface import FastJetInterface
 
 from config.features import F
 from config.oracles import *

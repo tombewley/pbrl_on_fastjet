@@ -1,4 +1,4 @@
-from fastjet.interface import FastJetInterface
+from config.interface import FastJetInterface
 
 P = {
     "pbrl": {
