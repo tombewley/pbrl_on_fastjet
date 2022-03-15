@@ -63,8 +63,8 @@ if __name__ == "__main__":
     # Sense checks
     if P["deployment"]["agent"] == "dqn": 
         P["pbrl"]["discrete_action_map"] = fastjet.env.DISCRETE_ACTION_MAP
-    if P["deployment"]["agent"] == "steve": 
-        assert not P["agent"]["input_normaliser"]
+    if P["deployment"]["agent"] in {"steve", "simple_model_based"}: 
+        assert "input_normaliser" not in P["agent"]
 
     env = gym.make("FastJet-v0", 
         task=P["deployment"]["task"], 
@@ -75,17 +75,24 @@ if __name__ == "__main__":
         camera_angle="outside_target_bg"
     )
 
+    agent_type = P["deployment"]["agent"]
+    agent_params = P["agent"][P["deployment"]["agent"]]
+
+    pbrl = PbrlObserver(P=P["pbrl"], features=F)
+    do_link = False
+    if P["deployment"]["train"] and P["pbrl"]["reward_source"] != "extrinsic": 
+        if P["deployment"]["agent"] in {"steve", "simple_model_based"}: 
+            agent_params["reward"] = pbrl.reward
+        else: do_link = True
+
     if "agent_load_fname" in P["deployment"]:
         fname = P["deployment"]["agent_load_fname"]
         agent = rlutils.load(f"agents/{fname}.agent", env)
         if P["deployment"]["train"]: agent.start()
         print(f"Loaded {fname}")
     else:
-        agent = rlutils.make(P["deployment"]["agent"], env=env, 
-                hyperparameters=P["agent"][P["deployment"]["agent"]])
-
-    pbrl = PbrlObserver(P=P["pbrl"], features=F)
-    if P["deployment"]["train"] and P["pbrl"]["reward_source"] != "extrinsic": pbrl.link(agent)    
+        agent = rlutils.make(agent_type, env=env, hyperparameters=agent_params)
+    if do_link: pbrl.link(agent)
 
     rlutils.deploy(agent, P=P["deployment"], train=P["deployment"]["train"],
         observers={

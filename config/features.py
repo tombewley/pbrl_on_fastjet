@@ -43,6 +43,7 @@
 40 | --  | demanded_thrust
 """
 import torch
+from torch.nn.functional import cosine_similarity as cosim
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 G_VEC = torch.tensor([0,9.81,0], device=device)
 
@@ -69,12 +70,12 @@ F["delta_pitch_error"] = lambda t: F["pitch_error"](t) - torch.abs(torch.asin(t[
 # NOTE: Due to symmetry, no reason for absolute heading and target heading to be meaningful
 F["hdg_error"]         = lambda t: torch.abs(torch.atan2(t[:,55], t[:,53]) - torch.atan2(t[:,33], t[:,31]))
 F["delta_hdg_error"]   = lambda t: F["hdg_error"](t) - torch.abs(torch.atan2(t[:,14], t[:,12]) - torch.atan2(t[:,33], t[:,31]))
-F["fwd_error"]         = lambda t: torch.acos(torch.sum(t[:,53:56]*t[:,31:34], axis=1))
-F["delta_fwd_error"]   = lambda t: F["fwd_error"](t) - torch.acos(torch.sum(t[:,12:15]*t[:,31:34], axis=1))
-F["up_error"]          = lambda t: torch.acos(torch.sum(t[:,56:59]*t[:,34:37], axis=1))
-F["delta_up_error"]    = lambda t: F["up_error"](t) - torch.acos(torch.sum(t[:,15:18]*t[:,34:37], axis=1))
-F["right_error"]       = lambda t: torch.acos(torch.sum(torch.cross(t[:,53:56], t[:,56:59])*torch.cross(t[:,31:34], t[:,34:37]), axis=1))
-F["delta_right_error"] = lambda t: F["right_error"](t) - torch.acos(torch.sum(torch.cross(t[:,12:15], t[:,15:18])*torch.cross(t[:,31:34], t[:,34:37]), axis=1))
+F["fwd_error"]         = lambda t: torch.acos(cosim(t[:,53:56], t[:,31:34], dim=1))
+F["delta_fwd_error"]   = lambda t: F["fwd_error"](t) - torch.acos(cosim(t[:,12:15], t[:,31:34], dim=1))
+F["up_error"]          = lambda t: torch.acos(cosim(t[:,56:59], t[:,34:37], dim=1))
+F["delta_up_error"]    = lambda t: F["up_error"](t) - torch.acos(cosim(t[:,15:18], t[:,34:37], dim=1))
+F["right_error"]       = lambda t: torch.acos(cosim(torch.cross(t[:,53:56], t[:,56:59]), torch.cross(t[:,31:34], t[:,34:37]), dim=1))
+F["delta_right_error"] = lambda t: F["right_error"](t) - torch.acos(cosim(torch.cross(t[:,12:15], t[:,15:18]), torch.cross(t[:,31:34], t[:,34:37]), dim=1))
 F["abs_vel"]           = lambda t: torch.linalg.norm(t[:,44:47], axis=1)
 F["g_force"]           = lambda t: torch.linalg.norm(t[:,47:50]+G_VEC, axis=1) / 9.81 # NOTE: Includes gravity
 F["pitch_rate"]        = lambda t: torch.abs(t[:,50])

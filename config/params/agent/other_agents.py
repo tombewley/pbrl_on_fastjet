@@ -12,17 +12,6 @@ P = {
             "tau": 0.005,
             "update_freq": 50
         },  
-        "steve": {
-            "net_model": [(None, 32), "R", (32, 64), "R", (64, None)],
-            "replay_capacity": 1e6,
-            "num_random_steps": 0, 
-            "num_models": 2, 
-            "model_freq": 1, 
-            "lr_model": 1e-3, 
-            "horizon": 5, 
-            "ddpg_parameters": {"td3": True},
-            "nonfixed_dim": 19 # NOTE: First 19 dimensions vary over an episode
-        },
         "dqn": {
             "net_Q": [(None, 256), "R", (256, 128), "R", (128, 64), "R", (64, None)],
             "input_normaliser": "***TODO***",
