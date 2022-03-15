@@ -23,6 +23,10 @@ def target_pose_linear(tr):
 def negative_dist_to_target(tr):
     return -F["dist"](tr)
 
+def dist_closing_uperr_when_close(tr):
+    d = F["dist"](tr)
+    return - (d + F["closing_speed"](tr) + 30. * F["up_error"](tr) * (d < 30.))
+
 if False: # TODO: generic function to visualise 2D reward
     from numpy import zeros
     import matplotlib.pyplot as plt
