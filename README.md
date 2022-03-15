@@ -13,6 +13,6 @@ Commands for running online preference-based RL (task = seek out a goal position
 ```
 python run.py oracle=0 model.tree_by_variance defaults
 python run.py oracle=0 model.net defaults
-python run.py human model.tree defaults
+python run.py human model.tree_by_variance defaults
 python run.py human net defaults
 ```
