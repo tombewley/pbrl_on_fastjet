@@ -6,10 +6,10 @@ P = {
         "interface": {
             "kind": OracleInterface, 
             "oracle": [
-                target_pose_tree,             # 0
-                target_pose_linear,           # 1
-                negative_dist_to_target,      # 2
-                dist_closing_uperr_when_close # 3
+                target_pose_tree,        # 0
+                target_pose_linear,      # 1
+                negative_dist_to_target, # 2
+                dist_closing_uperr       # 3
             ]
         },
     }

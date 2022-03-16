@@ -5,10 +5,10 @@ P = {
     },
     "agent": {
         "simple_model_based": {  
-            "net_model": [(None, 32), "R", (32, 64), "R", (64, None)],
-            "probabilistic": True,
+            "net_model": [(None, 128), "R", (128, 128), "R", (128, None)],
+            "probabilistic": False,
             "replay_capacity": 5e5,
-            "num_random_steps": 0,#1e5,
+            "num_random_steps": 1e5,
             "batch_size": 32,
             "model_freq": 10, # Number of steps between model updates
             "lr_model": 1e-3,
