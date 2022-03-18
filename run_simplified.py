@@ -67,9 +67,6 @@ agent.memory.__init__(agent.memory.capacity, reward=pbrl.reward, relabel_mode="e
 pbrl.relabel_memory = agent.memory.relabel
 # ================================
 
-import wandb
-wandb.init(project="test")
-
 for ep in range(40000):
     state, done = env.reset(), False
     while not done:
@@ -97,8 +94,8 @@ for ep in range(40000):
 
         state, state_torch = next_state, next_state_torch
 
-    # Once-per episode method
+    # Once-per episode method which stores or discards the latest episode according to
+    # observe_freq, outputs some logs, and triggers a preference batch/reward update 
+    # according to feedback_freq. The next episode does not begin until the update is complete.
     logs = pbrl.per_episode(ep)
     print(ep, "\n", logs)
-
-    wandb.log(logs)
