@@ -16,3 +16,5 @@ python run.py oracle=0 model.net defaults
 python run.py human model.tree_by_variance defaults
 python run.py human net defaults
 ```
+
+Alternatively, `run_simplified.py` is a heavily-commented script for running the process on a different task (follow another aircraft on a fixed flight path) with exemplar parameters and reduced use of black box functions from rlutils.

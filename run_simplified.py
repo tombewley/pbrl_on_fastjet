@@ -1,6 +1,6 @@
 """
 Simplified script for running preference-based reinforcement learning,
-with exemplar parameters and reduced use of external functions.
+with exemplar parameters and reduced use of functions from rlutils.
 """
 
 import fastjet
