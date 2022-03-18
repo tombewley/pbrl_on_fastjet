@@ -1,5 +1,5 @@
 """
-Script for running preference-based reinforcement learning
+Script for running preference-based reinforcement learning.
 """
 
 import sys
