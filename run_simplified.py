@@ -45,7 +45,9 @@ pbrl = PbrlObserver(
         "reward_source": "model",
         "model": {
             "kind": RewardTree, # Use tree as the reward function model
-            "split_by_variance": True, # Splitting method used by the tree (variance seems to work well)
+            "preference_eqn": "thurstone", # Use Thurstone's preference equation
+            "loss_func": "bce", # Use binary cross-entropy loss function
+            "split_by_variance": True, # Use variance-based splitting method
             # Additional tree growth parameters...
             "p_clip": 0.1, "m_max": 100, "num_from_queue": float("inf"), "min_samples_leaf": 1, "store_all_qual": False, "alpha": 0.001,
         },
