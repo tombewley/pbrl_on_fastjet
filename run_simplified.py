@@ -18,24 +18,29 @@ from config.features import F
 from config.params.base import P
 
 
+NUM_EPISODES = 80000
+AGENT_SAVE_FREQ = 10000
+TIME_LIMIT = 20 # Limit on episode length
 RENDER_ON = False
+WANDB_ON = True # Whether to enable Weights & Biases monitoring
 
-env = make_env("FastJet-v0", 
+
+env = wrappers.TimeLimit(make_env("FastJet-v0",
     task="follow", # Task variant; specified in fastjet.tasks
     continuous=True, # Continuous or discrete actions
     skip_frames=25, # Number of simulator frames to run per timestep
     render_mode=("human" if RENDER_ON else False),
     camera_angle="outside_target_bg"
-)
-env = wrappers.TimeLimit(env, 20) # Limit on episode length
+    ),
+    max_episode_steps=TIME_LIMIT)
 
 # PbrlObserver is the master class that handles the reward learning process.
 pbrl = PbrlObserver(
     P={
         "feedback_budget": 10000, # Total number of preferences to be collected
-        "observe_freq": 20, # Proportion of episodes stored for use in preference learning (higher = smaller proportion)
+        "observe_freq": 40, # Proportion of episodes stored for use in preference learning (higher = smaller proportion)
         "feedback_freq": 200, # Frequency of preference batches/updates
-        "num_episodes_before_freeze": 20000, # Period over which preferences are collected
+        "num_episodes_before_freeze": 40000, # Period over which preferences are collected
         "scheduling_coef": 0, # Whether to bias preference collection to later in the period (deprecated)
         "reward_source": "model",
         "model": {
@@ -67,7 +72,13 @@ agent.memory.__init__(agent.memory.capacity, reward=pbrl.reward, relabel_mode="e
 pbrl.relabel_memory = agent.memory.relabel
 # ================================
 
-for ep in range(40000):
+if WANDB_ON:
+    import wandb, os
+    run = wandb.init(project="fastjet-follow")
+    save_dir = f"agents/{run.name}"
+    os.makedirs(save_dir, exist_ok=True)
+
+for ep in range(NUM_EPISODES):
     state, done = env.reset(), False
     while not done:
 
@@ -99,3 +110,6 @@ for ep in range(40000):
     # according to feedback_freq. The next episode does not begin until the update is complete.
     logs = pbrl.per_episode(ep)
     print(ep, "\n", logs)
+    if WANDB_ON: wandb.log(logs)
+
+    if (ep+1) % AGENT_SAVE_FREQ == 0: agent.save(f"{save_dir}/{ep+1}")
