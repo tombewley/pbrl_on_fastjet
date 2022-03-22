@@ -26,6 +26,9 @@ def negative_dist_to_target(tr):
 def dist_closing_uperr(tr):
     return - (F["dist"](tr) + 0.1 * F["closing_speed"](tr) + 30. * F["up_error"](tr))
 
+def dist_closing_uperr_v2(tr):
+    return - (F["dist"](tr) + 0.05 * F["closing_speed"](tr) + 10. * F["up_error"](tr))
+
 if False: # TODO: generic function to visualise 2D reward
     from numpy import zeros
     import matplotlib.pyplot as plt
