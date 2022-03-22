@@ -8,7 +8,6 @@ P = {
             "num_batches_per_update": 100,
             "batch_size": 32
         },
-        "feedback_freq": 100,
         "reward_source": "model"
     }
 }

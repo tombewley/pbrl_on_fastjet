@@ -14,7 +14,6 @@ P = {
             "store_all_qual": False,
             "alpha": 0.001,
         },
-        "feedback_freq": 500,
         "reward_source": "model"
     }
 }
