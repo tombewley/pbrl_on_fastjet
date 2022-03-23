@@ -18,11 +18,11 @@ from config.features import F
 from config.params.base import P
 
 
-NUM_EPISODES = 80000
+NUM_EPISODES = 100000
 AGENT_SAVE_FREQ = 10000
 TIME_LIMIT = 20 # Limit on episode length
 RENDER_ON = False
-WANDB_ON = True # Whether to enable Weights & Biases monitoring
+WANDB_ON = False # Whether to enable Weights & Biases monitoring
 
 
 env = wrappers.TimeLimit(make_env("FastJet-v0",
@@ -38,9 +38,9 @@ env = wrappers.TimeLimit(make_env("FastJet-v0",
 pbrl = PbrlObserver(
     P={
         "feedback_budget": 10000, # Total number of preferences to be collected
-        "observe_freq": 40, # Proportion of episodes stored for use in preference learning (higher = smaller proportion)
-        "feedback_freq": 200, # Frequency of preference batches/updates
-        "num_episodes_before_freeze": 40000, # Period over which preferences are collected
+        "observe_freq": 50, # Proportion of episodes stored for use in preference learning (higher = smaller proportion)
+        "feedback_freq": 100, # Frequency of preference batches/updates
+        "num_episodes_before_freeze": 50000, # Period over which preferences are collected
         "scheduling_coef": 0, # Whether to bias preference collection to later in the period (deprecated)
         "reward_source": "model",
         "model": {
