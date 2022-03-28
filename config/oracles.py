@@ -1,18 +1,14 @@
-from numpy import pi
-from torch import tensor
+from math import pi
 from .features import F
 
 def target_pose_tree(tr):
-    def reward(d, v, f, u):
-        constant = -1.
-        reward_d   = 0. if d < 20      else (-1. if d < 50      else -2.) 
-        reward_v   = 0. if v < 0       else -1.
-        reward_f   = 0. if f < pi/4 else (-1. if f < pi/2 else -2.)
-        reward_u   = 0. if u < pi/4 else (-1. if u < pi/2 else -2.)
-        return constant + reward_d + reward_v + reward_f + reward_u
-    return tensor([reward(d, v, f, u) for d, v, f, u in zip(
-           F["dist"](tr), F["closing_speed"](tr), F["fwd_error"](tr), F["up_error"](tr))],
-           device=tr.device)
+    d, c, f, u = F["dist"](tr), F["closing_speed"](tr), F["fwd_error"](tr), F["up_error"](tr)
+    reward_d = (-1. * (d > 20).float()) + (-1. * (d > 50).float())
+    reward_c = (-1 * (c > 0).float())
+    reward_f = (-1. * (f > pi/4).float()) + (-1. * (f > pi/2).float())
+    reward_u = (-1. * (u > pi/4).float()) + (-1. * (u > pi/2).float())
+    constant = -1.
+    return reward_d + reward_c + reward_f + reward_u + constant
 
 def target_pose_linear(tr): 
     """

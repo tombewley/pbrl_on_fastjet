@@ -2,18 +2,15 @@ SKIP_FRAMES = 25
 
 P = {
     "deployment": {
-        "task": "target",
         "train": True,
         "agent": "sac",
         "num_episodes": 100000,
-        "episode_time_limit": 500 / SKIP_FRAMES, # Num frames = episode_time_limit * skip_frames
-        "skip_frames": SKIP_FRAMES
     },
     "agent": {
         "sac": {
             "net_pi": [(None, 256), "R", (256, 256), "R", (256, None)],
             "net_Q": [(None, 256), "R", (256, 256), "R", (256, None)],
-            "input_normaliser": "obs_lims",
+            "input_normaliser": "box_bounds",
             "replay_capacity": 5e5,
             "batch_size": 32, 
             "lr_pi": 1e-4, 

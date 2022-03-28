@@ -49,40 +49,40 @@ G_VEC = torch.tensor([0,9.81,0], device=device)
 
 # NOTE: Makes more sense to evaluate performance w.r.t. *previous* target
 F = {}
-F["dist"]              = lambda t: torch.linalg.norm(t[:,41:44] - t[:,19:22], axis=1)
-F["closing_speed"]     = lambda t: F["dist"](t) - torch.linalg.norm(t[:,0:3] - t[:,19:22], axis=1)
-F["alt"]               = lambda t: t[:,42]
-F["target_alt"]        = lambda t: t[:,20]
+F["dist"]              = lambda t: torch.linalg.norm(t[...,41:44] - t[...,19:22], axis=-1)
+F["closing_speed"]     = lambda t: F["dist"](t) - torch.linalg.norm(t[...,0:3] - t[...,19:22], axis=-1)
+F["alt"]               = lambda t: t[...,42]
+F["target_alt"]        = lambda t: t[...,20]
 F["alt_error"]         = lambda t: torch.abs(F["alt"](t) - F["target_alt"](t))
-F["delta_alt_error"]   = lambda t: F["alt_error"](t) - torch.abs(t[:,1] - F["target_alt"](t))
-F["dist_xz"]           = lambda t: (((t[:,41] - t[:,19])**2) + ((t[:,43] - t[:,21])**2))**0.5
-F["delta_dist_xz"]     = lambda t: F["dist_xz"](t) - (((t[:,0] - t[:,19])**2) + ((t[:,2] - t[:,21])**2))**0.5
-F["pitch"]             = lambda t: torch.asin(t[:,54])
+F["delta_alt_error"]   = lambda t: F["alt_error"](t) - torch.abs(t[...,1] - F["target_alt"](t))
+F["dist_xz"]           = lambda t: (((t[...,41] - t[...,19])**2) + ((t[...,43] - t[...,21])**2))**0.5
+F["delta_dist_xz"]     = lambda t: F["dist_xz"](t) - (((t[...,0] - t[...,19])**2) + ((t[...,2] - t[...,21])**2))**0.5
+F["pitch"]             = lambda t: torch.asin(t[...,54])
 F["abs_pitch"]         = lambda t: torch.abs(F["pitch"](t))
-F["target_pitch"]      = lambda t: torch.asin(t[:,32])
+F["target_pitch"]      = lambda t: torch.asin(t[...,32])
 F["pitch_error"]       = lambda t: torch.abs(F["pitch"](t) - F["target_pitch"](t))
-F["delta_pitch_error"] = lambda t: F["pitch_error"](t) - torch.abs(torch.asin(t[:,13]) - F["target_pitch"](t))
-# F["roll"]              = lambda t: torch.atan2(torch.sum(___, axis=1), torch.sum(___, axis=1)) # NOTE: BIT OF A MESS TO COMPUTE
+F["delta_pitch_error"] = lambda t: F["pitch_error"](t) - torch.abs(torch.asin(t[...,13]) - F["target_pitch"](t))
+# F["roll"]              = lambda t: torch.atan2(torch.sum(___, axis=-1), torch.sum(___, axis=-1)) # NOTE: BIT OF A MESS TO COMPUTE
 # F["abs_roll"]          = lambda t: torch.abs(F["roll"](t))
-# F["target_roll"]       = lambda t: torch.atan2(torch.sum(___, axis=1), torch.sum(___, axis=1)) 
+# F["target_roll"]       = lambda t: torch.atan2(torch.sum(___, axis=-1), torch.sum(___, axis=-1)) 
 # F["roll_error"]        = lambda t: torch.abs(F["roll"](t) - F["target_roll"](t))
-# F["delta_roll_error"]  = lambda t: F["roll_error"](t) - torch.abs(torch.atan2(torch.sum(___, axis=1), torch.sum(___, axis=1)) - F["target_roll"](t))
+# F["delta_roll_error"]  = lambda t: F["roll_error"](t) - torch.abs(torch.atan2(torch.sum(___, axis=-1), torch.sum(___, axis=-1)) - F["target_roll"](t))
 # NOTE: Due to symmetry, no reason for absolute heading and target heading to be meaningful
-F["hdg_error"]         = lambda t: torch.abs(torch.atan2(t[:,55], t[:,53]) - torch.atan2(t[:,33], t[:,31]))
-F["delta_hdg_error"]   = lambda t: F["hdg_error"](t) - torch.abs(torch.atan2(t[:,14], t[:,12]) - torch.atan2(t[:,33], t[:,31]))
-F["fwd_error"]         = lambda t: torch.acos(cosim(t[:,53:56], t[:,31:34], dim=1))
-F["delta_fwd_error"]   = lambda t: F["fwd_error"](t) - torch.acos(cosim(t[:,12:15], t[:,31:34], dim=1))
-F["up_error"]          = lambda t: torch.acos(cosim(t[:,56:59], t[:,34:37], dim=1))
-F["delta_up_error"]    = lambda t: F["up_error"](t) - torch.acos(cosim(t[:,15:18], t[:,34:37], dim=1))
-F["right_error"]       = lambda t: torch.acos(cosim(torch.cross(t[:,53:56], t[:,56:59]), torch.cross(t[:,31:34], t[:,34:37]), dim=1))
-F["delta_right_error"] = lambda t: F["right_error"](t) - torch.acos(cosim(torch.cross(t[:,12:15], t[:,15:18]), torch.cross(t[:,31:34], t[:,34:37]), dim=1))
-F["abs_vel"]           = lambda t: torch.linalg.norm(t[:,44:47], axis=1)
-F["g_force"]           = lambda t: torch.linalg.norm(t[:,47:50]+G_VEC, axis=1) / 9.81 # NOTE: Includes gravity
-F["pitch_rate"]        = lambda t: torch.abs(t[:,50])
-F["roll_rate"]         = lambda t: torch.abs(t[:,51]) 
-F["yaw_rate"]          = lambda t: torch.abs(t[:,52])
-F["thrust"]            = lambda t: t[:,59]
-F["delta_thrust"]      = lambda t: torch.abs(F["thrust"](t) - t[:,18])
+F["hdg_error"]         = lambda t: torch.abs(torch.atan2(t[...,55], t[...,53]) - torch.atan2(t[...,33], t[...,31]))
+F["delta_hdg_error"]   = lambda t: F["hdg_error"](t) - torch.abs(torch.atan2(t[...,14], t[...,12]) - torch.atan2(t[...,33], t[...,31]))
+F["fwd_error"]         = lambda t: torch.acos(cosim(t[...,53:56], t[...,31:34], dim=-1))
+F["delta_fwd_error"]   = lambda t: F["fwd_error"](t) - torch.acos(cosim(t[...,12:15], t[...,31:34], dim=-1))
+F["up_error"]          = lambda t: torch.acos(cosim(t[...,56:59], t[...,34:37], dim=-1))
+F["delta_up_error"]    = lambda t: F["up_error"](t) - torch.acos(cosim(t[...,15:18], t[...,34:37], dim=-1))
+F["right_error"]       = lambda t: torch.acos(cosim(torch.cross(t[...,53:56], t[...,56:59]), torch.cross(t[...,31:34], t[...,34:37]), dim=-1))
+F["delta_right_error"] = lambda t: F["right_error"](t) - torch.acos(cosim(torch.cross(t[...,12:15], t[...,15:18]), torch.cross(t[...,31:34], t[...,34:37]), dim=-1))
+F["abs_vel"]           = lambda t: torch.linalg.norm(t[...,44:47], axis=-1)
+F["g_force"]           = lambda t: torch.linalg.norm(t[...,47:50]+G_VEC, axis=-1) / 9.81 # NOTE: Includes gravity
+F["pitch_rate"]        = lambda t: torch.abs(t[...,50])
+F["roll_rate"]         = lambda t: torch.abs(t[...,51]) 
+F["yaw_rate"]          = lambda t: torch.abs(t[...,52])
+F["thrust"]            = lambda t: t[...,59]
+F["delta_thrust"]      = lambda t: torch.abs(F["thrust"](t) - t[...,18])
 
 # TODO: Action rewards?
 
