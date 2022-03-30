@@ -1,6 +1,7 @@
 P = {
     "deployment": {
-        "num_episodes": 40
+        "num_episodes": 40,
+        "checkpoint_freq": 40
     },
     "pbrl": {
         "feedback_budget": 40,
@@ -14,6 +15,7 @@ P = {
             "probabilistic": True, 
             "num_std": 0 # NOTE: <<<<
         },
+        "save_freq": 40
         # "logger": {
         #     "freq": 2,
         #     "plots": {

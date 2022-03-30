@@ -21,7 +21,7 @@ P = {
             "planning": {
                 "num_iterations": 10,
                 "num_particles": 100,
-                "horizon": 20,
+                "horizon_params": ("constant", 20),
                 "num_elites": 10,
                 "alpha": 0.1,
                 "gamma": 0.99
