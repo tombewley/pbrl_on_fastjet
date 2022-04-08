@@ -17,7 +17,7 @@ P = {
             "num_from_queue": float("inf"),
             "min_samples_leaf": 1,
             "store_all_qual": False,
-            "alpha": 0.01,
+            "alpha": 0.001,
         },
         "reward_source": "model"
     }
