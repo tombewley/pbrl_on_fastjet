@@ -1,8 +1,8 @@
 P = {
     "deployment": { 
-        "checkpoint_freq": 10000
+        "checkpoint_freq": 100
     },
     "pbrl": {
-        "save_freq": 10000
+        "save_freq": 100
     }
 }

@@ -1,9 +1,14 @@
+from ...features import preprocessor, features
 from rlutils.observers.pbrl.models import RewardTree
 
 P = {
     "pbrl": {
+        "featuriser": {
+            "preprocessor": preprocessor,
+            "features": features
+        },
         "model": {
-            "kind": RewardTree,
+            "class": RewardTree,
             "preference_eqn": "thurstone",
             "loss_func": "0-1",
             "split_by_variance": True,

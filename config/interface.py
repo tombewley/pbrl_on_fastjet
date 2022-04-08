@@ -1,6 +1,8 @@
 from vpython import canvas, label, slider, vector
 import numpy as np
 from scipy.interpolate import interp1d
+
+from rlutils.observers.pbrl.interfaces import Interface
 from fastjet.env import FastJetEnv
 from fastjet.fast_jet import dir_to_vec, vec_to_dir
 
@@ -8,14 +10,14 @@ from fastjet.fast_jet import dir_to_vec, vec_to_dir
 STATE_DIM = 37
 ACTION_DIM = 4
 
-class FastJetInterface():
-    def __init__(self, pbrl, kind): 
-        self.pbrl, self.oracle = pbrl, None
+class FastJetInterface(Interface):
+    def __init__(self, pbrl, P): 
+        Interface.__init__(self, pbrl)
 
     def __enter__(self):
         self.envs = []
         for e in range(2):
-            self.envs.append(FastJetEnv(task="target", camera_angle="bbox"))
+            self.envs.append(FastJetEnv(task="target_easy", camera_angle="bbox"))
             self.envs[e].jets[0].arrow_length = 20
             self.envs[e].render_mode = "human"
             self.envs[e].reset()

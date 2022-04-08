@@ -12,12 +12,14 @@ from rlutils.observers.pbrl.interfaces import OracleInterface
 
 from torch import from_numpy
 
+from config.features import preprocessor, features
 from config.oracles import dist_closing_uperr
 from config.interface import FastJetInterface
-from config.features import F
-from config.params.base import P
+from config.params.agent.sac import P as P_sac
+from config.params.agent.pets import P as P_pets
 
 
+ORACLE_MODE = True # Whether to use synthetic oracle preferences (False = human preferences via web app)
 NUM_EPISODES = 100000
 AGENT_SAVE_FREQ = 10000
 TIME_LIMIT = 20 # Limit on episode length
@@ -43,8 +45,13 @@ pbrl = PbrlObserver(
         "num_episodes_before_freeze": 50000, # Period over which preferences are collected
         "scheduling_coef": 0, # Whether to bias preference collection to later in the period (deprecated)
         "reward_source": "model",
+        # A set of features to use in the reward function, derived from (s,a,s') tuples
+        "featuriser": {
+            "preprocessor": preprocessor,
+            "features": features
+        },
         "model": {
-            "kind": RewardTree, # Use tree as the reward function model
+            "class": RewardTree, # Use tree as the reward function model
             "preference_eqn": "thurstone", # Use Thurstone's preference equation
             "loss_func": "bce", # Use binary cross-entropy loss function
             "split_by_variance": True, # Use variance-based splitting method
@@ -54,24 +61,38 @@ pbrl = PbrlObserver(
         # Parameters for trajectory pair sampling strategy
         "sampler": {"weight": "ucb", "constrained": True, "probabilistic": True, "num_std": 0},
         "interface": {
-            "kind": OracleInterface, # Use synthetic oracle preferences
+            "class": OracleInterface, # Use synthetic oracle preferences
             "oracle": dist_closing_uperr # Ground-truth reward function to use in OracleInterface
-            # "kind": FastJetInterface, # Use human preferences via VPython interface
+            
+        } if ORACLE_MODE else {
+            "class": FastJetInterface, # Use human preferences via VPython interface
         }
-    },
-    features=F # A set of features to use in the reward function, derived from (s,a,s') tuples
+    }
 )
 
 # === AGENT-SPECIFIC CREATION ====
-agent = make_agent("sac", env=env, hyperparameters=P["agent"]["sac"])
-# Link the reward learner with the agent's replay memory, which enables labelling of transitions
-# with rewards, and relabelling of the entire memory when the reward function is updated.
-# NOTE: This is the trickiest function to make agent-agnostic; it requires:
-#   (1) The agent class to have access to pbrl.reward for labelling each new (s,a,s').
-#   (2) The pbrl class to have a "callback" method (pbrl.relabel_memory) which triggers
-#       the relabelling process after each update.
-agent.memory.__init__(agent.memory.capacity, reward=pbrl.reward, relabel_mode="eager")
-pbrl.relabel_memory = agent.memory.relabel
+# Give the agent access to the learnt reward function.
+# NOTE: This is the trickiest functionality to make agent-agnostic.
+if False: 
+    """
+    For off-policy model-free algorithms (e.g. SAC), need to link to the replay memory. This enables labelling
+    of transitions with rewards, and relabelling of the entire memory when the reward function is updated.
+    Requires:
+      (1) The agent class to have access to pbrl.reward for labelling each new (s,a,s').
+      (2) The pbrl class to have a "callback" method (pbrl.relabel_memory) which triggers
+          the relabelling process after each update.
+    """
+    agent = make_agent("sac", env=env, hyperparameters=P_sac["agent"])
+    agent.memory.__init__(agent.memory.capacity, reward=pbrl.reward, relabel_mode="eager")
+    pbrl.relabel_memory = agent.memory.relabel
+if True:
+    """
+    For the model-based algorithms with decision-time planning (e.g. PETS), need to give the model
+    access to the reward function.
+    """
+    P_pets["agent"]["reward"] = pbrl.reward
+    agent = make_agent("pets", env=env, hyperparameters=P_pets["agent"])
+
 # ================================
 
 if WANDB_ON:

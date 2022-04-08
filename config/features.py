@@ -1,3 +1,95 @@
+import torch
+from torch.nn.functional import cosine_similarity as cosim
+
+# NOTE: Makes more sense to evaluate performance w.r.t. *previous* target
+# TODO: Action rewards?
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+G_VEC = torch.tensor([0,9.81,0], device=device)
+
+def preprocessor(t):
+    """Normalise fwd/up components for both ego and target to make them unit vectors."""
+    for low, high in ((12,15), (15,18), (31,34), (34,37), (53,56), (56,59), (72,75), (75,78)):
+        t[...,low:high] /= torch.linalg.norm(t[...,low:high], axis=-1).unsqueeze(-1)
+    return t
+
+def dist(t, f):              return torch.linalg.norm(t[...,41:44] - t[...,19:22], axis=-1)
+def closing_speed(t, f):     return f["dist"] - torch.linalg.norm(t[...,0:3] - t[...,19:22], axis=-1)
+
+def alt(t, f):               return t[...,42]
+def target_alt(t, f):        return t[...,20]
+def alt_error(t, f):         return torch.abs(f["alt"] - f["target_alt"])
+def delta_alt_error(t, f):   return f["alt_error"] - torch.abs(t[...,1] - f["target_alt"])
+
+def dist_xz(t, f):           return (((t[...,41] - t[...,19])**2) + ((t[...,43] - t[...,21])**2))**0.5
+def delta_dist_xz(t, f):     return f["dist_xz"] - (((t[...,0] - t[...,19])**2) + ((t[...,2] - t[...,21])**2))**0.5
+
+def pitch(t, f):             return torch.asin(t[...,54])
+def abs_pitch(t, f):         return torch.abs(f["pitch"])
+def target_pitch(t, f):      return torch.asin(t[...,32])
+def pitch_error(t, f):       return torch.abs(f["pitch"] - f["target_pitch"])
+def delta_pitch_error(t, f): return f["pitch_error"] - torch.abs(torch.asin(t[...,13]) - f["target_pitch"])
+
+# TODO: Compute these properly
+# f["roll"]              = lambda t: torch.atan2(torch.sum(___, axis=-1), torch.sum(___, axis=-1))
+# f["abs_roll"]          = lambda t: torch.abs(f["roll"](t, f))
+# f["target_roll"]       = lambda t: torch.atan2(torch.sum(___, axis=-1), torch.sum(___, axis=-1)) 
+# f["roll_error"]        = lambda t: torch.abs(f["roll"](t, f) - f["target_roll"](t, f))
+# f["delta_roll_error"]  = lambda t: f["roll_error"](t, f) - torch.abs(torch.atan2(torch.sum(___, axis=-1), torch.sum(___, axis=-1)) - f["target_roll"](t, f))
+
+def _target_hdg(t, f):       return torch.atan2(t[...,33], t[...,31]) # NOTE: Due to symmetry, no reason for absolute heading and target heading to be meaningful
+def hdg_error(t, f):         return torch.abs(torch.atan2(t[...,55], t[...,53]) - _target_hdg(t, f))
+def delta_hdg_error(t, f):   return f["hdg_error"] - torch.abs(torch.atan2(t[...,14], t[...,12]) - _target_hdg(t, f))
+
+def fwd_error(t, f):         return  torch.acos(cosim(t[...,53:56], t[...,31:34], dim=-1))
+def delta_fwd_error(t, f):   return f["fwd_error"] - torch.acos(cosim(t[...,12:15], t[...,31:34], dim=-1))
+
+def up_error(t, f):          return torch.acos(cosim(t[...,56:59], t[...,34:37], dim=-1))
+def delta_up_error(t, f):    return f["up_error"] - torch.acos(cosim(t[...,15:18], t[...,34:37], dim=-1))
+
+def _target_right(t, f):     return torch.cross(t[...,31:34], t[...,34:37])
+def right_error(t, f):       return torch.acos(cosim(torch.cross(t[...,53:56], t[...,56:59]), _target_right(t, f), dim=-1))
+def delta_right_error(t, f): return f["right_error"] - torch.acos(cosim(torch.cross(t[...,12:15], t[...,15:18]), _target_right(t, f), dim=-1))
+
+def abs_vel(t, f):           return torch.linalg.norm(t[...,44:47], axis=-1)
+def g_force(t, f):           return torch.linalg.norm(t[...,47:50]+G_VEC, axis=-1) / 9.81 # NOTE: Includes gravity
+def pitch_rate(t, f):        return torch.abs(t[...,50])
+def roll_rate(t, f):         return torch.abs(t[...,51]) 
+def yaw_rate(t, f):          return torch.abs(t[...,52])
+def thrust(t, f):            return t[...,59]
+def delta_thrust(t, f):      return torch.abs(f["thrust"] - t[...,18])
+
+features = [
+    dist,
+    closing_speed,
+    alt,
+    target_alt,
+    alt_error,
+    delta_alt_error,
+    dist_xz,
+    delta_dist_xz,
+    pitch,
+    abs_pitch,
+    target_pitch,
+    pitch_error,
+    delta_pitch_error,
+    hdg_error,
+    delta_hdg_error,
+    fwd_error,
+    delta_fwd_error,
+    up_error,
+    delta_up_error,
+    right_error,
+    delta_right_error,
+    abs_vel,
+    g_force,
+    pitch_rate,
+    roll_rate,
+    yaw_rate,
+    thrust,
+    delta_thrust
+]
+
 """
  t   t+1
  0 | 41  | ego.pos.x
@@ -42,49 +134,6 @@
 39 | --  | demanded_yaw
 40 | --  | demanded_thrust
 """
-import torch
-from torch.nn.functional import cosine_similarity as cosim
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-G_VEC = torch.tensor([0,9.81,0], device=device)
-
-# NOTE: Makes more sense to evaluate performance w.r.t. *previous* target
-F = {}
-F["dist"]              = lambda t: torch.linalg.norm(t[...,41:44] - t[...,19:22], axis=-1)
-F["closing_speed"]     = lambda t: F["dist"](t) - torch.linalg.norm(t[...,0:3] - t[...,19:22], axis=-1)
-F["alt"]               = lambda t: t[...,42]
-F["target_alt"]        = lambda t: t[...,20]
-F["alt_error"]         = lambda t: torch.abs(F["alt"](t) - F["target_alt"](t))
-F["delta_alt_error"]   = lambda t: F["alt_error"](t) - torch.abs(t[...,1] - F["target_alt"](t))
-F["dist_xz"]           = lambda t: (((t[...,41] - t[...,19])**2) + ((t[...,43] - t[...,21])**2))**0.5
-F["delta_dist_xz"]     = lambda t: F["dist_xz"](t) - (((t[...,0] - t[...,19])**2) + ((t[...,2] - t[...,21])**2))**0.5
-F["pitch"]             = lambda t: torch.asin(t[...,54])
-F["abs_pitch"]         = lambda t: torch.abs(F["pitch"](t))
-F["target_pitch"]      = lambda t: torch.asin(t[...,32])
-F["pitch_error"]       = lambda t: torch.abs(F["pitch"](t) - F["target_pitch"](t))
-F["delta_pitch_error"] = lambda t: F["pitch_error"](t) - torch.abs(torch.asin(t[...,13]) - F["target_pitch"](t))
-# F["roll"]              = lambda t: torch.atan2(torch.sum(___, axis=-1), torch.sum(___, axis=-1)) # NOTE: BIT OF A MESS TO COMPUTE
-# F["abs_roll"]          = lambda t: torch.abs(F["roll"](t))
-# F["target_roll"]       = lambda t: torch.atan2(torch.sum(___, axis=-1), torch.sum(___, axis=-1)) 
-# F["roll_error"]        = lambda t: torch.abs(F["roll"](t) - F["target_roll"](t))
-# F["delta_roll_error"]  = lambda t: F["roll_error"](t) - torch.abs(torch.atan2(torch.sum(___, axis=-1), torch.sum(___, axis=-1)) - F["target_roll"](t))
-# NOTE: Due to symmetry, no reason for absolute heading and target heading to be meaningful
-F["hdg_error"]         = lambda t: torch.abs(torch.atan2(t[...,55], t[...,53]) - torch.atan2(t[...,33], t[...,31]))
-F["delta_hdg_error"]   = lambda t: F["hdg_error"](t) - torch.abs(torch.atan2(t[...,14], t[...,12]) - torch.atan2(t[...,33], t[...,31]))
-F["fwd_error"]         = lambda t: torch.acos(cosim(t[...,53:56], t[...,31:34], dim=-1))
-F["delta_fwd_error"]   = lambda t: F["fwd_error"](t) - torch.acos(cosim(t[...,12:15], t[...,31:34], dim=-1))
-F["up_error"]          = lambda t: torch.acos(cosim(t[...,56:59], t[...,34:37], dim=-1))
-F["delta_up_error"]    = lambda t: F["up_error"](t) - torch.acos(cosim(t[...,15:18], t[...,34:37], dim=-1))
-F["right_error"]       = lambda t: torch.acos(cosim(torch.cross(t[...,53:56], t[...,56:59]), torch.cross(t[...,31:34], t[...,34:37]), dim=-1))
-F["delta_right_error"] = lambda t: F["right_error"](t) - torch.acos(cosim(torch.cross(t[...,12:15], t[...,15:18]), torch.cross(t[...,31:34], t[...,34:37]), dim=-1))
-F["abs_vel"]           = lambda t: torch.linalg.norm(t[...,44:47], axis=-1)
-F["g_force"]           = lambda t: torch.linalg.norm(t[...,47:50]+G_VEC, axis=-1) / 9.81 # NOTE: Includes gravity
-F["pitch_rate"]        = lambda t: torch.abs(t[...,50])
-F["roll_rate"]         = lambda t: torch.abs(t[...,51]) 
-F["yaw_rate"]          = lambda t: torch.abs(t[...,52])
-F["thrust"]            = lambda t: t[...,59]
-F["delta_thrust"]      = lambda t: torch.abs(F["thrust"](t) - t[...,18])
-
-# TODO: Action rewards?
 
 """
 In original reward machines:

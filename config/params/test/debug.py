@@ -16,7 +16,7 @@ P = {
             "num_std": 0 # NOTE: <<<<
         },
         "save_freq": 40
-        # "logger": {
+        # "explainer": {
         #     "freq": 2,
         #     "plots": {
         #         "tree_loss_vs_m"

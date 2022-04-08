@@ -3,7 +3,6 @@ from rlutils.observers.pbrl.models import RewardNet, RewardTree
 from rlutils.observers.pbrl.interfaces import OracleInterface
 from config.interface import FastJetInterface
 
-from config.features import F
 from config.oracles import *
 
 P = {
@@ -28,7 +27,7 @@ P = {
     }
 }
 
-pbrl = load(f"logs/follow_random/1000.pbrl", P, features=F)
+pbrl = load(f"logs/follow_random/1000.pbrl", P)
 pbrl.sampler.seed(0)
 
 pbrl.preference_batch(10)

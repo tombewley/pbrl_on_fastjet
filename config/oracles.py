@@ -1,8 +1,9 @@
 from math import pi
-from .features import F
+from .features import *
 
-def target_pose_tree(tr):
-    d, c, f, u = F["dist"](tr), F["closing_speed"](tr), F["fwd_error"](tr), F["up_error"](tr)
+def target_pose_tree(t):
+    d, f, u = dist(t, None), fwd_error(t, None), up_error(t, None)
+    c = closing_speed(t, {"dist": d})
     reward_d = (-1. * (d > 20).float()) + (-1. * (d > 50).float())
     reward_c = (-1 * (c > 0).float())
     reward_f = (-1. * (f > pi/4).float()) + (-1. * (f > pi/2).float())
@@ -10,20 +11,22 @@ def target_pose_tree(tr):
     constant = -1.
     return reward_d + reward_c + reward_f + reward_u + constant
 
-def target_pose_linear(tr): 
+def target_pose_linear(t): 
     """
     Linear function of angular and positional deviation from target pose.
     """
-    return - (F["fwd_error"](tr) + F["up_error"](tr) + 0.01*F["dist"](tr))
+    return - (fwd_error(t, None) + up_error(t, None) + 0.075*dist(t, None))
     
-def negative_dist_to_target(tr):
-    return -F["dist"](tr)
+def dist_only(t):
+    return -dist(t, None)
 
-def dist_closing_uperr(tr):
-    return - (F["dist"](tr) + 0.1 * F["closing_speed"](tr) + 30. * F["up_error"](tr))
+def dist_closing_uperr(t):
+    d = dist(t, None)
+    return - (d + 0.1 * closing_speed(t, {"dist": d}) + 30. * up_error(t, None))
 
-def dist_closing_uperr_v2(tr):
-    return - (F["dist"](tr) + 0.05 * F["closing_speed"](tr) + 10. * F["up_error"](tr))
+def dist_closing_uperr_v2(t):
+    d = dist(t, None)
+    return - (d + 0.05 * closing_speed(t, {"dist": d}) + 10. * up_error(t, None))
 
 if False: # TODO: generic function to visualise 2D reward
     from numpy import zeros

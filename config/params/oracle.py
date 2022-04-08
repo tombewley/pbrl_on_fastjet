@@ -4,14 +4,16 @@ from ..oracles import *
 P = {
     "pbrl": {
         "interface": {
-            "kind": OracleInterface, 
-            "oracle": [
-                target_pose_tree,        # 0
-                target_pose_linear,      # 1
-                negative_dist_to_target, # 2
-                dist_closing_uperr,      # 3
-                dist_closing_uperr_v2    # 4
-            ]
-        },
+            "class": OracleInterface, 
+            "oracle": {
+                "target_pose_tree":      target_pose_tree,
+                "target_pose_linear":    target_pose_linear,
+                "dist_only":             dist_only,
+                "dist_closing_uperr":    dist_closing_uperr,
+                "dist_closing_uperr_v2": dist_closing_uperr_v2,
+                "g_force":               g_force,
+                "pitch":                 pitch,
+            },
+        }
     }
 }

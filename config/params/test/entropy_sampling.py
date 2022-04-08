@@ -14,7 +14,7 @@ P = {
             "probabilistic": True,
             "preference_eqn": "thurstone"
         },
-        "logger": {
+        "explainer": {
             "freq": 2,
             "plots": {
                 "sampler_matrix"
