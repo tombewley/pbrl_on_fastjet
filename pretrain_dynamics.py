@@ -8,7 +8,7 @@ from torch import save
 from pprint import pprint
 
 
-TASK = "follow"
+TASK = "target_hard"
 NUM_STEPS = int(1e5)
 NUM_UPDATES = int(1e5)
 
@@ -30,4 +30,4 @@ for i in range(int(NUM_UPDATES)):
     print(i, mean(agent.ep_losses))
     del agent.ep_losses[:]
 
-save(agent.model.nets, f"pretrained_dynamics/{TASK}_v1.dynamics")
+agent.save(f"pretrained_dynamics/{TASK}_v1")
