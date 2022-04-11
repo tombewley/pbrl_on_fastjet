@@ -10,7 +10,7 @@ P = {
         "scheduling_coef": 1,
         "sampler": {
             "weight": "uniform",
-            "constrained": False,
+            "recency_constraint": False,
             "probabilistic": True
         }
     }

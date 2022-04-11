@@ -6,14 +6,13 @@ P = {
         "agent": "pets",
     },
     "agent": {
-        "pretrained_model": load("pretrained_dynamics/\
-\
-follow_v1\
-\
-.dynamics", map_location=device("cuda" if is_available() else "cpu")),
+        "pretrained_model": load(
+            "pretrained_dynamics/follow_v1.dynamics"
+            # "pretrained_dynamics/target_hard_v1.dynamics"
+            , map_location=device("cuda" if is_available() else "cpu")),
 
         "replay_capacity": 5e5,
-        "num_random_steps": 1000,
+        "num_random_steps": 0,#1000,
         "batch_ratio": 1,
 
         "model_freq": 1,
@@ -31,6 +30,7 @@ follow_v1\
         },
         
         # ----------------
+        "cem_review": False,
         "rollout_review": False
         # ----------------
     }

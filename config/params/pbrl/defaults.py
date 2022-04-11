@@ -7,7 +7,7 @@ P = {
         "scheduling_coef": 0,
         "sampler": {
             "weight": "ucb", 
-            "constrained": True, 
+            "recency_constraint": True,
             "probabilistic": True, 
             "num_std": 0 # NOTE: <<<<
         }

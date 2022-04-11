@@ -20,6 +20,10 @@ def target_pose_linear(t):
 def dist_only(t):
     return -dist(t, None)
 
+def dist_pose_when_close(t):
+    d = dist(t, None)
+    return - (d + (d < 30).float() * (fwd_error(t, None) + up_error(t, None)))
+
 def dist_closing_uperr(t):
     d = dist(t, None)
     return - (d + 0.1 * closing_speed(t, {"dist": d}) + 30. * up_error(t, None))

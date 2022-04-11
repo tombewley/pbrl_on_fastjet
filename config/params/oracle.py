@@ -1,19 +1,14 @@
+import inspect
 from rlutils.observers.pbrl.interfaces import OracleInterface
-from ..oracles import *
+from .. import oracles
 
 P = {
     "pbrl": {
         "interface": {
-            "class": OracleInterface, 
-            "oracle": {
-                "target_pose_tree":      target_pose_tree,
-                "target_pose_linear":    target_pose_linear,
-                "dist_only":             dist_only,
-                "dist_closing_uperr":    dist_closing_uperr,
-                "dist_closing_uperr_v2": dist_closing_uperr_v2,
-                "g_force":               g_force,
-                "pitch":                 pitch,
-            },
+            "class": OracleInterface,
+            # https://stackoverflow.com/a/63449487
+            "oracle": {name: func for name, func in oracles.__dict__.items()
+                       if inspect.isfunction(func) and inspect.getmodule(func) == oracles}
         }
     }
 }
