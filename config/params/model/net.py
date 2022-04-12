@@ -3,6 +3,7 @@ from rlutils.observers.pbrl.models import RewardNet
 
 P = {
     "pbrl": {
+        "reward_source": "model",
         "featuriser": {
             "preprocessor": preprocessor,
             "features": features
@@ -12,7 +13,6 @@ P = {
             "preference_eqn": "bradley-terry",
             "num_batches_per_update": 100,
             "batch_size": 32
-        },
-        "reward_source": "model"
+        }
     }
 }

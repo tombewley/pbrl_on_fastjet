@@ -9,12 +9,6 @@ P = {
         "feedback_freq": 1,
         "num_episodes_before_freeze": 200,
         "scheduling_coef": 0,
-        "sampler": {
-            "weight": "entropy",
-            "preference_eqn": "thurstone",
-            "recency_constraint": False, # NOTE: <<<<
-            "probabilistic": True
-        },
         "save_freq": 50
     }
 }

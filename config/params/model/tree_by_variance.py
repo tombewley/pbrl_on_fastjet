@@ -3,6 +3,7 @@ from rlutils.observers.pbrl.models import RewardTree
 
 P = {
     "pbrl": {
+        "reward_source": "model",
         "featuriser": {
             "preprocessor": preprocessor,
             "features": features
@@ -19,6 +20,5 @@ P = {
             "store_all_qual": False,
             "alpha": 0.001,
         },
-        "reward_source": "model"
     }
 }

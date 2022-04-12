@@ -12,7 +12,7 @@ P = {
             , map_location=device("cuda" if is_available() else "cpu")),
 
         "replay_capacity": 5e5,
-        "num_random_steps": 0,#1000,
+        "num_random_steps": 0,
         "batch_ratio": 1,
 
         "model_freq": 1,
