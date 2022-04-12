@@ -1,7 +1,7 @@
 P = {
     "deployment": {
         "num_episodes": 200,
-        "checkpoint_freq": 50,
+        "checkpoint_freq": 50
     },
     "pbrl": {
         "feedback_budget": 10000, 
