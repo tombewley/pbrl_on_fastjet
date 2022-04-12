@@ -15,6 +15,7 @@ PARAMS=(
 )
 
 module load CUDA
+conda init bash
 conda activate env_pytorch
 
 srun python run.py task.follow oracle=dist_closing_uperr wandb ${PARAMS[$SLURM_ARRAY_TASK_ID]}
