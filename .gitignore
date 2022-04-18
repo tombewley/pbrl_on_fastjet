@@ -3,7 +3,7 @@ __pycache__/
 PilotData/
 agents/
 demos/
-experiments/
+results/
 logs/
 models/
 observations/
