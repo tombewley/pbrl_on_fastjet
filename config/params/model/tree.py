@@ -4,11 +4,11 @@ from rlutils.observers.pbrl.models import RewardTree
 P = {
     "pbrl": {
         "reward_source": "model",
-        "featuriser": {
-            "preprocessor": preprocessor,
-            "features": features
-        },
         "model": {
+            "featuriser": {
+                "preprocessor": preprocessor,
+                "features": features
+            },
             "class": RewardTree,
             "preference_eqn": "thurstone",
             "loss_func": "bce",
