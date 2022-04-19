@@ -8,9 +8,9 @@
 #SBATCH --array=0-3
 
 PARAMS=(
-    # "agent.pets schedule.200_one_per_ep model.tree_by_variance sampler.ucb_nostd_recency"
+    "agent.pets schedule.200_one_per_ep model.tree_by_variance sampler.ucb_nostd_recency"
     "agent.pets schedule.200_one_per_ep model.net sampler.ucb_nostd_recency"
-    # "agent.pets schedule.200"
+    "agent.pets schedule.200"
 )
 
 module load CUDA
