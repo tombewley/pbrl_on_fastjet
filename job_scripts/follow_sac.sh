@@ -8,9 +8,9 @@
 #SBATCH --array=0-2
 
 PARAMS=(
-    "agent.sac schedule.100k_batch model.tree_by_variance sampler.ucb_nostd_recency"
+    # "agent.sac schedule.100k_batch model.tree_by_variance sampler.ucb_nostd_recency"
     "agent.sac schedule.100k_batch model.net sampler.ucb_nostd_recency"
-    "agent.sac schedule.100k"
+    # "agent.sac schedule.100k"
 )
 
 module load CUDA
