@@ -1,7 +1,6 @@
 import torch
 from torch.nn.functional import cosine_similarity as cosim
 
-# NOTE: Makes more sense to evaluate performance w.r.t. *previous* target
 # TODO: Action rewards?
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -13,22 +12,22 @@ def preprocessor(t):
         t[...,low:high] /= torch.linalg.norm(t[...,low:high], axis=-1).unsqueeze(-1)
     return t
 
-def dist(t, f):              return torch.linalg.norm(t[...,41:44] - t[...,19:22], axis=-1)
+def dist(t, f):              return torch.linalg.norm(t[...,41:44] - t[...,60:63], axis=-1)
 def closing_speed(t, f):     return f["dist"] - torch.linalg.norm(t[...,0:3] - t[...,19:22], axis=-1)
 
 def alt(t, f):               return t[...,42]
-def target_alt(t, f):        return t[...,20]
+def target_alt(t, f):        return t[...,61]
 def alt_error(t, f):         return torch.abs(f["alt"] - f["target_alt"])
-def delta_alt_error(t, f):   return f["alt_error"] - torch.abs(t[...,1] - f["target_alt"])
+def delta_alt_error(t, f):   return f["alt_error"] - torch.abs(t[...,1] - t[...,20])
 
-def dist_xz(t, f):           return (((t[...,41] - t[...,19])**2) + ((t[...,43] - t[...,21])**2))**0.5
+def dist_xz(t, f):           return (((t[...,41] - t[...,60])**2) + ((t[...,43] - t[...,62])**2))**0.5
 def delta_dist_xz(t, f):     return f["dist_xz"] - (((t[...,0] - t[...,19])**2) + ((t[...,2] - t[...,21])**2))**0.5
 
 def pitch(t, f):             return torch.asin(t[...,54])
 def abs_pitch(t, f):         return torch.abs(f["pitch"])
-def target_pitch(t, f):      return torch.asin(t[...,32])
+def target_pitch(t, f):      return torch.asin(t[...,73])
 def pitch_error(t, f):       return torch.abs(f["pitch"] - f["target_pitch"])
-def delta_pitch_error(t, f): return f["pitch_error"] - torch.abs(torch.asin(t[...,13]) - f["target_pitch"])
+def delta_pitch_error(t, f): return f["pitch_error"] - torch.abs(torch.asin(t[...,13]) - torch.asin(t[...,32]))
 
 # TODO: Compute these properly
 # f["roll"]              = lambda t: torch.atan2(torch.sum(___, axis=-1), torch.sum(___, axis=-1))
@@ -37,19 +36,26 @@ def delta_pitch_error(t, f): return f["pitch_error"] - torch.abs(torch.asin(t[..
 # f["roll_error"]        = lambda t: torch.abs(f["roll"](t, f) - f["target_roll"](t, f))
 # f["delta_roll_error"]  = lambda t: f["roll_error"](t, f) - torch.abs(torch.atan2(torch.sum(___, axis=-1), torch.sum(___, axis=-1)) - f["target_roll"](t, f))
 
-def _target_hdg(t, f):       return torch.atan2(t[...,33], t[...,31]) # NOTE: Due to symmetry, no reason for absolute heading and target heading to be meaningful
-def hdg_error(t, f):         return torch.abs(torch.atan2(t[...,55], t[...,53]) - _target_hdg(t, f))
-def delta_hdg_error(t, f):   return f["hdg_error"] - torch.abs(torch.atan2(t[...,14], t[...,12]) - _target_hdg(t, f))
+# NOTE: Due to symmetry, no reason for absolute heading and target heading to be meaningful
+def hdg_error(t, f):         return torch.abs(torch.atan2(t[...,55], t[...,53]) - torch.atan2(t[...,74], t[...,72]))
+def delta_hdg_error(t, f):   return f["hdg_error"] - torch.abs(torch.atan2(t[...,14], t[...,12]) -  torch.atan2(t[...,33], t[...,31]))
 
-def fwd_error(t, f):         return  torch.acos(cosim(t[...,53:56], t[...,31:34], dim=-1))
-def delta_fwd_error(t, f):   return f["fwd_error"] - torch.acos(cosim(t[...,12:15], t[...,31:34], dim=-1))
+def _target_fwd(t):          return t[...,72:75]
+def _prev_target_fwd(t):     return t[...,31:34]
+def _target_up(t):           return t[...,75:78]
+def _prev_target_up(t):      return t[...,34:37]
 
-def up_error(t, f):          return torch.acos(cosim(t[...,56:59], t[...,34:37], dim=-1))
-def delta_up_error(t, f):    return f["up_error"] - torch.acos(cosim(t[...,15:18], t[...,34:37], dim=-1))
+def fwd_error(t, f):         return torch.acos(cosim(t[...,53:56], _target_fwd(t), dim=-1))
+def delta_fwd_error(t, f):   return f["fwd_error"] - \
+                                    torch.acos(cosim(t[...,12:15], _prev_target_fwd(t), dim=-1))
 
-def _target_right(t, f):     return torch.cross(t[...,31:34], t[...,34:37])
-def right_error(t, f):       return torch.acos(cosim(torch.cross(t[...,53:56], t[...,56:59]), _target_right(t, f), dim=-1))
-def delta_right_error(t, f): return f["right_error"] - torch.acos(cosim(torch.cross(t[...,12:15], t[...,15:18]), _target_right(t, f), dim=-1))
+def up_error(t, f):          return torch.acos(cosim(t[...,56:59], _target_up(t), dim=-1))
+def delta_up_error(t, f):    return f["up_error"] - \
+                                    torch.acos(cosim(t[...,15:18], _prev_target_up(t), dim=-1))
+
+def right_error(t, f):       return torch.acos(cosim(torch.cross(t[...,53:56], t[...,56:59]), torch.cross(_target_fwd(t), _target_up(t)), dim=-1))
+def delta_right_error(t, f): return f["right_error"] - \
+                                    torch.acos(cosim(torch.cross(t[...,12:15], t[...,15:18]), torch.cross(_prev_target_fwd(t), _prev_target_up(t)), dim=-1))
 
 def abs_vel(t, f):           return torch.linalg.norm(t[...,44:47], axis=-1)
 def g_force(t, f):           return torch.linalg.norm(t[...,47:50]+G_VEC, axis=-1) / 9.81 # NOTE: Includes gravity
