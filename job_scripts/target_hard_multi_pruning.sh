@@ -8,12 +8,12 @@
 #SBATCH --array=0-6
 
 PARAMS=(
-    "model.tree sweep.multi_pruning=0",
-    "model.tree sweep.multi_pruning=1",
-    "model.tree sweep.multi_pruning=2",
-    "model.tree sweep.multi_pruning=3",
-    "model.tree sweep.multi_pruning=4",
-    "model.tree sweep.multi_pruning=5",
+    "model.tree sweep.multi_pruning=0"
+    "model.tree sweep.multi_pruning=1"
+    "model.tree sweep.multi_pruning=2"
+    "model.tree sweep.multi_pruning=3"
+    "model.tree sweep.multi_pruning=4"
+    "model.tree sweep.multi_pruning=5"
     "model.net"
 )
 
