@@ -4,35 +4,34 @@ Script for running preference-based reinforcement learning.
 
 import sys
 from pprint import pprint
-import torch
-torch.set_printoptions(precision=3, linewidth=100000)   
 import gym
 
 import fastjet
 import rlutils
 from rlutils.observers.pbrl import PbrlObserver
 from rlutils.observers.sum_logger import SumLogger
+from rlutils.common.env_wrappers import DoneWipeWrapper
 
-from config.params.base import P as base
+from config.base import P as base
 
 
 if __name__ == "__main__":
-    P = rlutils.build_params(sys.argv[1:], base, root_dir="config.params")
-    P["deployment"]["project_name"] = "fastjet-" + P["deployment"]["task"]
-
+    P = rlutils.build_params(sys.argv[1:], base, root_dir="config")
     pprint(P)
 
-    if P["deployment"]["agent"] == "dqn": 
-        P["pbrl"]["discrete_action_map"] = fastjet.env.DISCRETE_ACTION_MAP
-
-    env = gym.make("FastJet-v0", 
-        task=P["deployment"]["task"], 
-        continuous=(P["deployment"]["agent"] != "dqn"), 
-        skip_frames=P["deployment"]["skip_frames"],
-        render_mode=("human" if "render_freq" in P["deployment"] 
-                     and P["deployment"]["render_freq"] > 0 else False),
-        camera_angle="outside_target_bg"
-    )
+    if P["deployment"]["env"] == "FastJet-v0":
+        env = gym.make(P["deployment"]["env"],
+            task=P["deployment"]["task"],
+            continuous=(P["deployment"]["agent"] != "dqn"),
+            skip_frames=P["deployment"]["skip_frames"],
+            render_mode=("human" if "render_freq" in P["deployment"]
+                        and P["deployment"]["render_freq"] > 0 else False),
+            camera_angle="outside_target_bg"
+        )
+        if P["deployment"]["agent"] == "dqn":
+            P["pbrl"]["discrete_action_map"] = fastjet.env.DISCRETE_ACTION_MAP
+    else:
+        env = DoneWipeWrapper(gym.make(P["deployment"]["env"]))
 
     pbrl = PbrlObserver(P=P["pbrl"])
 
@@ -55,15 +54,13 @@ if __name__ == "__main__":
 
     if do_link: pbrl.link(agent)
 
-    # pprint(agent.P)
-
     rlutils.deploy(agent, P=P["deployment"], train=P["deployment"]["train"],
         observers={
             "pbrl": pbrl,
-            "phase_counter": SumLogger({
-                "name": "phase", 
-                "source": "info", 
-                "key": "phase"
-            })
+            # "phase_counter": SumLogger({
+            #     "name": "phase",
+            #     "source": "info",
+            #     "key": "phase"
+            # })
         }
     )

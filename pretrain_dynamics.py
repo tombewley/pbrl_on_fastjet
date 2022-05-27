@@ -12,7 +12,7 @@ TASK = "target_hard"
 NUM_STEPS = int(1e5)
 NUM_UPDATES = int(1e5)
 
-P = build_params([f"task.{TASK}", "agent.pets_pretrain"], root_dir="config.params")
+P = build_params([f"task.{TASK}", "agent.pets_pretrain"], root_dir="config")
 P["deployment"]["num_steps"] = P["agent"]["num_random_steps"] = NUM_STEPS
 
 env = gym.make("FastJet-v0", task=P["deployment"]["task"], continuous=True, skip_frames=P["deployment"]["skip_frames"])

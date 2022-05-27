@@ -36,11 +36,12 @@ class FastJetInterface(Interface):
         self.slider.delete()
 
     def __call__(self, i, j, n_interp=10):
-        (T_i, d_i), (T_j, d_j) = self.pbrl.episodes[i].shape, self.pbrl.episodes[j].shape
+        tr_i, tr_j = self.pbrl.graph.nodes[i]["transitions"], self.pbrl.graph.nodes[j]["transitions"]
+        (T_i, d_i), (T_j, d_j) = tr_i.shape, tr_j.shape
         assert d_i == d_j == 2*STATE_DIM + ACTION_DIM
         # Add final next_state.
-        states = (np.vstack((self.pbrl.episodes[i][:,:STATE_DIM], self.pbrl.episodes[i][-1:,-STATE_DIM:])),
-                  np.vstack((self.pbrl.episodes[j][:,:STATE_DIM], self.pbrl.episodes[j][-1:,-STATE_DIM:])))
+        states = (np.vstack((tr_i[:,:STATE_DIM], tr_i[-1:,-STATE_DIM:])),
+                  np.vstack((tr_j[:,:STATE_DIM], tr_j[-1:,-STATE_DIM:])))
         # Extract pose information from states (use hdg, pitch, roll representation) and perform interpolation        
         T = (T_i+1, T_j+1)
         poses = tuple((interp1d(range(T[e]), states_to_poses(s), axis=0, 
@@ -116,3 +117,11 @@ def states_to_poses(states):
     wrap[abs_delta > np.abs(delta-two_pi)] = -two_pi
     poses[1:,6:12] += np.cumsum(wrap, axis=0)
     return poses
+
+P = {
+    "pbrl": {
+        "interface": {
+            "class": FastJetInterface
+        }
+    }
+}

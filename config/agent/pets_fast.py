@@ -7,8 +7,8 @@ P = {
     },
     "agent": {
         "pretrained_model": load(
-            # "pretrained_dynamics/follow_v1.dynamics"
-            "pretrained_dynamics/target_hard_v1.dynamics"
+            "pretrained_dynamics/follow_v1.dynamics"
+            # "pretrained_dynamics/target_hard_v1.dynamics"
             , map_location=device("cuda" if is_available() else "cpu")),
 
         "replay_capacity": 5e5,

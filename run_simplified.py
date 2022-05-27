@@ -12,11 +12,11 @@ from rlutils.observers.pbrl.interfaces import OracleInterface
 
 from torch import from_numpy
 
-from config.features import preprocessor, features
-from config.oracles import dist_closing_uperr
-from config.interface import FastJetInterface
-from config.params.agent.sac import P as P_sac
-from config.params.agent.pets import P as P_pets
+from config.features.fastjet_default import preprocessor, features
+from config.oracle.fastjet_follow.dist_closing_uperr_v2 import oracle
+from config.human.fastjet import FastJetInterface
+from config.agent.sac import P as P_sac
+from config.agent.pets import P as P_pets
 
 
 ORACLE_MODE = True # Whether to use synthetic oracle preferences (False = human preferences via web app)
@@ -62,7 +62,7 @@ pbrl = PbrlObserver(
         "sampler": {"weight": "ucb", "constrained": True, "probabilistic": True, "num_std": 0},
         "interface": {
             "class": OracleInterface, # Use synthetic oracle preferences
-            "oracle": dist_closing_uperr # Ground-truth reward function to use in OracleInterface
+            "oracle": oracle # Ground-truth reward function to use in OracleInterface
             
         } if ORACLE_MODE else {
             "class": FastJetInterface, # Use human preferences via VPython interface

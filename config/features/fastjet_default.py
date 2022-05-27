@@ -96,6 +96,17 @@ features = [
     delta_thrust
 ]
 
+P = {
+    "pbrl": {
+        "model": {
+            "featuriser": {
+                "preprocessor": preprocessor,
+                "features": features
+            }
+        }
+    }
+}
+
 """
  t   t+1
  0 | 41  | ego.pos.x

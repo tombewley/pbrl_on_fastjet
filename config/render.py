@@ -1,5 +1,5 @@
 P = {
     "deployment": {
-        "wandb_monitor": True
+        "render_freq": 1
     }
 }

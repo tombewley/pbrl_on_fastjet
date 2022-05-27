@@ -8,7 +8,9 @@ def termination(_, __, next_states):
 
 P = {
     "deployment": {
+        "env": "FastJet-v0",
         "task": "target_hard",
+        "project_name": "fastjet-target_hard",
         "episode_time_limit": 750 / SKIP_FRAMES,
         "skip_frames": SKIP_FRAMES
     },
