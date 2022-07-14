@@ -6,8 +6,9 @@ import sys
 from pprint import pprint
 import gym
 
-import fastjet
 import rlutils
+import fastjet
+import holonav
 from rlutils.observers.pbrl import PbrlObserver
 from rlutils.observers.sum_logger import SumLogger
 from rlutils.common.env_wrappers import DoneWipeWrapper
@@ -28,8 +29,6 @@ if __name__ == "__main__":
                         and P["deployment"]["render_freq"] > 0 else False),
             camera_angle="outside_target_bg"
         )
-        if P["deployment"]["agent"] == "dqn":
-            P["pbrl"]["discrete_action_map"] = fastjet.env.DISCRETE_ACTION_MAP
     else:
         env = DoneWipeWrapper(gym.make(P["deployment"]["env"]))
 

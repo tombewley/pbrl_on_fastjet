@@ -16,5 +16,8 @@ P = {
     },
     "agent": {
         "termination": termination
+    },
+    "pbrl": {
+        "save_path": "graphs_and_models/fastjet/target_hard"
     }
 }

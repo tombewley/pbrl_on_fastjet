@@ -3,9 +3,11 @@ __pycache__/
 PilotData/
 agents/
 demos/
-results/
+graphs_and_models/
 logs/
-models/
+notebooks/
 observations/
+results/
+scripts/
 video/
 wandb/

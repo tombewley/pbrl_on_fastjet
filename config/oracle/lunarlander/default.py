@@ -1,4 +1,4 @@
-from rlutils.observers.pbrl.interfaces import OracleInterface
+from rlutils.rewards.pbrl.interfaces import OracleInterface
 import numpy as np
 
 class old:
@@ -13,6 +13,9 @@ class old:
 
     def reward_function(self, x):
         """Reward function for LunarLanderContinuous-v2."""
+
+        # NOTE: Uses state for prev_shaping and next state for new shaping
+
         if self.done: return 0
         pos_x, pos_y, vel_x, vel_y, ang, _, left_contact, right_contact, main_engine, side_engine, _, crash, _, land = x
         if crash or abs(pos_x) >= 1.0: self.done = True; reward = -100

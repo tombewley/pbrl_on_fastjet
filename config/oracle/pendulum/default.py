@@ -1,5 +1,5 @@
 from torch import pi, acos, clamp
-from rlutils.observers.pbrl.interfaces import OracleInterface
+from rlutils.rewards.pbrl.interfaces import OracleInterface
 
 MAX_TORQUE = 2.
 

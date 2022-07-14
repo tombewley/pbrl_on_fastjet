@@ -1,4 +1,4 @@
-from rlutils.observers.pbrl.models import RewardNet
+from rlutils.rewards.pbrl.models import RewardNet
 
 P = {
     "pbrl": {

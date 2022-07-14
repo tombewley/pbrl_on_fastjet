@@ -1,13 +1,19 @@
-from rlutils.observers.pbrl.models import RewardTree
+from rlutils.rewards.pbrl.models import RewardTree
 
 P = {
     "pbrl": {
         "reward_source": "model",
         "model": {
             "class": RewardTree,
-            # "preference_eqn": "thurstone",
+
+            "preference_eqn": "bradley-terry",
             "loss_func": "bce",
-            "p_clip": 0.1,
+            "trees_per_update": 5,
+            "prune_ratio": 0.5,
+            "nodewise_partition": False,
+            "post_populate_with_all": False,
+            "alpha": 0,
+
             "m_max": 100,
             "num_from_queue": float("inf"),
             "min_samples_leaf": 1,
