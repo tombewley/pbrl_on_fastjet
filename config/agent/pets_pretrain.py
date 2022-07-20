@@ -1,6 +1,3 @@
-from torch import device, load
-from torch.cuda import is_available
-
 P = {
     "deployment": {
         "agent": "pets",

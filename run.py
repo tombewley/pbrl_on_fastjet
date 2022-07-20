@@ -5,12 +5,14 @@ Script for running preference-based reinforcement learning.
 import sys
 from pprint import pprint
 import gym
+from torch import device, load
+from torch.cuda import is_available
 
 import rlutils
 import fastjet
 import holonav
 from rlutils.observers.pbrl import PbrlObserver
-from rlutils.observers.sum_logger import SumLogger
+from rlutils.observers.loggers import SumLogger
 from rlutils.common.env_wrappers import DoneWipeWrapper
 
 from config.base import P as base
@@ -44,6 +46,11 @@ if __name__ == "__main__":
         if P["pbrl"]["reward_source"] != "extrinsic":
             if P["deployment"]["agent"] in {"steve", "pets", "mbpo"}:
                 P["agent"]["reward"] = pbrl.reward
+                if P["agent"]["pretrained_model"]:
+                    # NOTE: Loading pretrained model here
+                    P["agent"]["pretrained_model"] = load(
+                        f"pretrained_dynamics/{P['deployment']['task']}_v1.dynamics",
+                        map_location=device("cuda" if is_available() else "cpu"))
                 if P["deployment"]["agent"] == "mbpo":
                     raise Exception("Link to MBPO rollouts not memory!")
             else:
@@ -53,13 +60,5 @@ if __name__ == "__main__":
 
     if do_link: pbrl.link(agent)
 
-    rlutils.deploy(agent, P=P["deployment"], train=P["deployment"]["train"],
-        observers={
-            "pbrl": pbrl,
-            # "phase_counter": SumLogger({
-            #     "name": "phase",
-            #     "source": "info",
-            #     "key": "phase"
-            # })
-        }
-    )
+    P["deployment"]["observers"]["pbrl"] = pbrl
+    rlutils.deploy(agent, P=P["deployment"], train=P["deployment"]["train"])

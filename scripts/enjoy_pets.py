@@ -6,11 +6,15 @@ from torch import device, load as pt_load
 from torch.cuda import is_available
 P = build_params(["agent.pets"], root_dir="config")["agent"]
 
+"""
+Use notebooks.deep_explanation?
+"""
+
 
 TASK = "follow"
 DYNAMICS_PATH = "pretrained_dynamics/follow_v1.dynamics"
-PBRL_PATH = "models/woven-deluge-110/170.pbrl"
-RENDER = False
+PBRL_PATH = "graphs_and_models/fastjet/follow/charmed-totem-113/200.pbrl"
+RENDER = True
 WANDB = False
 
 
