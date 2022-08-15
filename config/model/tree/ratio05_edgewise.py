@@ -1,4 +1,4 @@
-from rlutils.rewards.pbrl.models import RewardTree
+from rlutils.rewards.models import RewardTree
 
 P = {
     "pbrl": {

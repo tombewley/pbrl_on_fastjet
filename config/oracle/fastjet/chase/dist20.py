@@ -1,5 +1,5 @@
 from torch import abs
-from rlutils.rewards.pbrl.interfaces import OracleInterface
+from rlutils.rewards.interfaces import OracleInterface
 from ....features.fastjet.default import *
 
 def oracle(s, a, ns):

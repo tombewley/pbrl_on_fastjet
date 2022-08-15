@@ -1,4 +1,4 @@
-from rlutils.rewards.pbrl.interfaces import OracleInterface
+from rlutils.rewards.interfaces import OracleInterface
 import numpy as np
 
 class old:

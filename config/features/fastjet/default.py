@@ -1,8 +1,8 @@
 import torch
-from torch.nn.functional import cosine_similarity as cosim
+from torch.nn.functional import cosine_similarity
 
 # TODO: Action rewards?
-print("TODO: New feature: line of sight error between fwd and vector to target")
+print("TODO: New feature: (absolute) line of sight differences between fwd and vector to target")
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 G_VEC = torch.tensor([0,9.81,0], device=device)
@@ -13,6 +13,10 @@ def preprocessor(s, a, ns):
         s [...,low:high] /= torch.linalg.norm(s [...,low:high], axis=-1).unsqueeze(-1)
         ns[...,low:high] /= torch.linalg.norm(ns[...,low:high], axis=-1).unsqueeze(-1)
     return s, a, ns
+
+def cosim(v1, v2, dim):
+    # NOTE: Even though have normalised in preprocessor, numerical imprecision means have to clamp again
+    return torch.clamp(cosine_similarity(v1, v2, dim=dim), -1, 1)
 
 def dist(s, a, ns, f):              return torch.linalg.norm(ns[...,0:3] - ns[...,19:22], axis=-1)
 def closing_speed(s, a, ns, f):     return f["dist"] - dist(None, None, s, None)

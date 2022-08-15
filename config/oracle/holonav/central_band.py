@@ -1,5 +1,5 @@
 from torch import logical_and
-from rlutils.rewards.pbrl.interfaces import OracleInterface
+from rlutils.rewards.interfaces import OracleInterface
 
 def oracle(tr):
     _, _, _, _, x, y = tr.T

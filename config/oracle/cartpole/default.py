@@ -1,5 +1,5 @@
 from torch import pi, logical_and
-from rlutils.rewards.pbrl.interfaces import OracleInterface
+from rlutils.rewards.interfaces import OracleInterface
 
 x_threshold = 2.4
 theta_threshold_radians = 12 * 2 * pi / 360

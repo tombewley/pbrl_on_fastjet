@@ -1,4 +1,4 @@
-from rlutils.rewards.pbrl.models import RewardTree
+from rlutils.rewards.models import RewardTree
 
 P = {
     "pbrl": {
@@ -7,10 +7,10 @@ P = {
             "class": RewardTree,
 
             "preference_eqn": "bradley-terry",
-            "loss_func": "bce",
+            "loss_func": "0-1",
             "trees_per_update": 1,
             "prune_ratio": None,
-            "alpha": 0.001,
+            "alpha": 0.01, # 0.001,
 
             "m_max": 100,
             "num_from_queue": float("inf"),
