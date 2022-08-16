@@ -1,9 +1,6 @@
 import torch
 from torch.nn.functional import cosine_similarity
 
-# TODO: Action rewards?
-print("TODO: New feature: (absolute) line of sight differences between fwd and vector to target")
-
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 G_VEC = torch.tensor([0,9.81,0], device=device)
 
@@ -18,7 +15,15 @@ def cosim(v1, v2, dim):
     # NOTE: Even though have normalised in preprocessor, numerical imprecision means have to clamp again
     return torch.clamp(cosine_similarity(v1, v2, dim=dim), -1, 1)
 
-def dist(s, a, ns, f):              return torch.linalg.norm(ns[...,0:3] - ns[...,19:22], axis=-1)
+# ============================
+def _fwd(s):                        return s[...,12:15]
+def _up(s):                         return s[...,15:18]
+def _target_fwd(s):                 return s[...,31:34]
+def _target_up(s):                  return s[...,34:37]
+def _vec_to_target(s):              return s[...,19:22] - s[...,0:3]
+# ============================
+
+def dist(s, a, ns, f):              return torch.linalg.norm(_vec_to_target(ns), axis=-1)
 def closing_speed(s, a, ns, f):     return f["dist"] - dist(None, None, s, None)
 
 def alt(s, a, ns, f):               return ns[...,1]
@@ -35,27 +40,31 @@ def target_pitch(s, a, ns, f):      return torch.asin(ns[...,32])
 def pitch_error(s, a, ns, f):       return torch.abs(f["pitch"] - f["target_pitch"])
 def delta_pitch_error(s, a, ns, f): return f["pitch_error"] - torch.abs(pitch(None, None, s, None) - target_pitch(None, None, s, None))
 
-# TODO: Compute these properly
-# f["roll"]              = lambda t: torch.atan2(torch.sum(___, axis=-1), torch.sum(___, axis=-1))
-# f["abs_roll"]          = lambda t: torch.abs(f["roll"](s, a, ns, f))
-# f["target_roll"]       = lambda t: torch.atan2(torch.sum(___, axis=-1), torch.sum(___, axis=-1)) 
-# f["roll_error"]        = lambda t: torch.abs(f["roll"](s, a, ns, f) - f["target_roll"](s, a, ns, f))
-# f["delta_roll_error"]  = lambda t: f["roll_error"](s, a, ns, f) - torch.abs(torch.atan2(torch.sum(___, axis=-1), torch.sum(___, axis=-1)) - f["target_roll"](s, a, ns, f))
+def _fwd_up_to_roll(fwd, up): # See fastjet.fast_jet.vec_to_dir
+    roll_0 = torch.stack((-fwd[...,2], torch.zeros_like(fwd[...,1]), fwd[...,0]), dim=-1)
+    return torch.atan2((roll_0 * up).sum(dim=-1), (torch.cross(roll_0, fwd) * up).sum(dim=-1))
+
+def roll(s, a, ns, f):              return _fwd_up_to_roll(_fwd(ns), _up(ns))
+def abs_roll(s, a, ns, f):          return torch.abs(f["roll"])
+def target_roll(s, a, ns, f):       return _fwd_up_to_roll(_target_fwd(ns), _target_up(ns))
+def roll_error(s, a, ns, f):        return torch.abs(f["roll"] - f["target_roll"])
+def delta_roll_error(s, a, ns, f):  return f["roll_error"] - torch.abs(roll(None, None, s, None) - target_roll(None, None, s, None))
 
 # NOTE: Due to symmetry, no reason for absolute heading and target heading to be meaningful
 def hdg_error(s, a, ns, f):         return torch.abs(torch.atan2(ns[...,14], ns[...,12]) - torch.atan2(ns[...,33], ns[...,31]))
 def delta_hdg_error(s, a, ns, f):   return f["hdg_error"] - hdg_error(None, None, s, None)
 
-def _target_fwd(s):                 return s[...,31:34]
-def fwd_error(s, a, ns, f):         return torch.acos(cosim(ns[...,12:15], _target_fwd(ns), dim=-1))
+def fwd_error(s, a, ns, f):         return torch.acos(cosim(_fwd(ns), _target_fwd(ns), dim=-1))
 def delta_fwd_error(s, a, ns, f):   return f["fwd_error"] - fwd_error(None, None, s, None)
 
-def _target_up(s):                  return s[...,34:37]
-def up_error(s, a, ns, f):          return torch.acos(cosim(ns[...,15:18], _target_up(ns), dim=-1))
+def up_error(s, a, ns, f):          return torch.acos(cosim(_up(ns), _target_up(ns), dim=-1))
 def delta_up_error(s, a, ns, f):    return f["up_error"] - up_error(None, None, s, None)
 
-def right_error(s, a, ns, f):       return torch.acos(cosim(torch.cross(ns[...,12:15], ns[...,15:18]), torch.cross(_target_fwd(ns), _target_up(ns)), dim=-1))
+def right_error(s, a, ns, f):       return torch.acos(cosim(torch.cross(_fwd(ns), _up(ns)), torch.cross(_target_fwd(ns), _target_up(ns)), dim=-1))
 def delta_right_error(s, a, ns, f): return f["right_error"] - right_error(None, None, s, None)
+
+def los_error(s, a, ns, f):         return torch.acos(cosim(_fwd(ns), _vec_to_target(ns), dim=-1)) # TODO: Make this direction-sensitive?
+def delta_los_error(s, a, ns, f):   return f["los_error"] - los_error(None, None, s, None)
 
 def abs_vel(s, a, ns, f):           return torch.linalg.norm(ns[...,3:6], axis=-1)
 def g_force(s, a, ns, f):           return torch.linalg.norm(ns[...,6:9]+G_VEC, axis=-1) / 9.81 # NOTE: Includes gravity
@@ -64,6 +73,8 @@ def roll_rate(s, a, ns, f):         return torch.abs(ns[...,10])
 def yaw_rate(s, a, ns, f):          return torch.abs(ns[...,11])
 def thrust(s, a, ns, f):            return ns[...,18]
 def delta_thrust(s, a, ns, f):      return torch.abs(f["thrust"] - thrust(None, None, s, None))
+
+# TODO: Action rewards based on (absolute) demands
 
 features = [
     dist,
@@ -79,6 +90,11 @@ features = [
     target_pitch,
     pitch_error,
     delta_pitch_error,
+    roll,
+    abs_roll,
+    target_roll,
+    roll_error,
+    delta_roll_error,
     hdg_error,
     delta_hdg_error,
     fwd_error,
@@ -87,6 +103,8 @@ features = [
     delta_up_error,
     right_error,
     delta_right_error,
+    los_error,
+    delta_los_error,
     abs_vel,
     g_force,
     pitch_rate,

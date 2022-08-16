@@ -5,6 +5,7 @@ P = {
         "env": "FastJet-v0",
         "task": "chase",
         "episode_time_limit": 500 / SKIP_FRAMES,
-        "skip_frames": SKIP_FRAMES
+        "skip_frames": SKIP_FRAMES,
+        "camera_angle": "outside_target_bg_skew"
     }
 }

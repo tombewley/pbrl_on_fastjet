@@ -23,13 +23,13 @@ if __name__ == "__main__":
     pprint(P)
 
     if P["deployment"]["env"] == "FastJet-v0":
-        env = gym.make(P["deployment"]["env"],
+        env = gym.make("FastJet-v0",
             task=P["deployment"]["task"],
             continuous=(P["deployment"]["agent"] != "dqn"),
             skip_frames=P["deployment"]["skip_frames"],
             render_mode=("human" if "render_freq" in P["deployment"]
                         and P["deployment"]["render_freq"] > 0 else False),
-            camera_angle="outside_target_bg"
+            camera_angle=P["deployment"]["camera_angle"]
         )
     else:
         env = DoneWipeWrapper(gym.make(P["deployment"]["env"]))
