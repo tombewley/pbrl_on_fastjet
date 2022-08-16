@@ -5,7 +5,6 @@ def oracle(s, a, ns):
     d = dist(s, a, ns, None)
     return - (d + 0.05 * closing_speed(s, a, ns, {"dist": d}) + 10. * up_error(s, a, ns, None))
 
-# TODO: Lots of nasty boilerplate here
 P = {
     "pbrl": {
         "interface": {

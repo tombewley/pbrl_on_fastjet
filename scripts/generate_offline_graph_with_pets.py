@@ -23,13 +23,14 @@ parser.add_argument("--render_freq", type=int, default=0)
 parser.add_argument("--dynamics_version", type=int, default=1)
 args = parser.parse_args()
 
+P = build_params(["agent.pets=2", f"env.fastjet.{args.task}"], root_dir="config") # NOTE: PETS variant 2 as base parameters
 
 # Create environment
 env = gym.make("FastJet-v0",
     task=args.task, 
-    skip_frames=25,
+    skip_frames=P["deployment"]["skip_frames"],
     render_mode="human" if args.render_freq > 0 else False,
-    camera_angle="outside_target_bg"
+    camera_angle=P["deployment"]["camera_angle"]
 )
 
 # Create PbrlObserver
@@ -43,11 +44,10 @@ pbrl = PbrlObserver({
 })
 
 # Create agent
-P = build_params(["agent.pets=2"], root_dir="config")["agent"] # NOTE: PETS variant 2 as base parameters
-P["pretrained_model"] = load(f"pretrained_dynamics/{args.task}_v{args.dynamics_version}.dynamics",
-                             map_location=device("cuda" if is_available() else "cpu"))
-P["reward"] = pbrl.reward
-agent = make("pets", env, hyperparameters=P)
+P["agent"]["pretrained_model"] = load(f"pretrained_dynamics/{args.task}_v{args.dynamics_version}.dynamics",
+                                      map_location=device("cuda" if is_available() else "cpu"))
+P["agent"]["reward"] = pbrl.reward
+agent = make("pets", env, hyperparameters=P["agent"])
 
 # Define class for randomising the CEM parameters on each episode
 class CEMUpdater:
@@ -69,7 +69,7 @@ cem_updater = CEMUpdater()
 cem_updater.per_episode(-1)
 deploy(agent=agent, P={
         "num_episodes": args.num_eps,
-        "episode_time_limit": 20,
+        "episode_time_limit": P["deployment"]["episode_time_limit"],
         "render_freq": args.render_freq,
         "observers": {"pbrl": pbrl, "cem_updater": cem_updater}
     }

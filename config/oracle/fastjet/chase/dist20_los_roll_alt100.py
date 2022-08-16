@@ -17,6 +17,6 @@ P = {
             "oracle": oracle
         },
         "save_path": "graphs_and_models/fastjet/chase/dist20_los_roll_alt100",
-        # "offline_graph_path": "offline_graphs/fastjet/chase/dist20_los_roll_alt100/___.graph"
+        "offline_graph_path": "offline_graphs/fastjet/chase/dist20_los_roll_alt100/0_100e_4950p.graph"
     }
 }
