@@ -34,7 +34,7 @@ P = {
             "class": OracleInterface,
             "oracle": oracle
         },
-        "save_path": "graphs_and_models/lunarlander/default",
-        # "offline_graph_path": "offline_graphs/lunarlander/default/___.graph"
+        "save_path": "graphs_and_models/lunarlander/adapted",
+        # "offline_graph_path": "offline_graphs/lunarlander/adapted/___.graph"
     }
 }

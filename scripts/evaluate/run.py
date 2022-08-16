@@ -30,11 +30,11 @@ for run_name in run_names:
         if i > 0: edgelist.append((n-1, n))
         n += 1
 
-# tau = rank_correlation(reward_functions + [oracle], graph)
+# tau = rank_correlation(graph, reward_functions + [oracle])
 # print(tau[-1,:-1])
-# loss = preference_loss(reward_functions, graph, loss_func="0-1")
+# loss = preference_loss(graph, reward_functions, loss_func="0-1")
 # print(loss)
-corr_r, corr_g, _, _ = epic(reward_functions + [oracle], graph, num_canon=0)
+corr_r, corr_g, _, _ = epic(graph, reward_functions + [oracle], num_canon=0)
 print(corr_r[-1,:-1])
 
 plt.figure()

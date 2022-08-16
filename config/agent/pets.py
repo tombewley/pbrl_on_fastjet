@@ -16,6 +16,5 @@ P = {
         "cem_warm_start":   [False, False,  True,   True,   ],
         "cem_alpha":        [0.5,   0.5,    0.5,    0.5,    ],
         "cem_temperature":  [0.,    0.,     0.5,    0.5,    ]
-
     }
 }
