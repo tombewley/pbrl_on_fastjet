@@ -7,7 +7,7 @@ P = {
             "class": RewardTree,
 
             "preference_eqn": "bradley-terry",
-            "loss_func": "bce",
+            "loss_func": "0-1",
             "trees_per_update": 5,
             "prune_ratio": 0.5,
             "nodewise_partition": False,

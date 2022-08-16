@@ -31,7 +31,6 @@ agent = make("pets", hyperparameters=P,
 )
 
 deploy(agent, {
-        "project_name": f"fastjet-{TASK}", 
         "num_episodes": 100, 
         "episode_time_limit": 20, 
         "render_freq": int(RENDER), 

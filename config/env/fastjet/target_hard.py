@@ -10,14 +10,10 @@ P = {
     "deployment": {
         "env": "FastJet-v0",
         "task": "target_hard",
-        "project_name": "fastjet-target_hard",
         "episode_time_limit": 750 / SKIP_FRAMES,
         "skip_frames": SKIP_FRAMES
     },
     "agent": {
         "termination": termination
-    },
-    "pbrl": {
-        "save_path": "graphs_and_models/fastjet/target_hard"
     }
 }
