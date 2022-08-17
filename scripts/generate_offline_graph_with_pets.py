@@ -1,29 +1,30 @@
 """
-Use PETS with a pretrained dynamics model to generate an evaluation dataset
-for Equivalent-Policy Invariant Comparison (EPIC).
+Use PETS with a pretrained dynamics model to generate an offline dataset
+for fidelity evaluation.
 """
 
 import os
 import argparse
-import importlib
 import gym, fastjet
 from torch import device, save, load
 from torch.cuda import is_available
 from random import randint
 from rlutils import build_params, make, deploy
 from rlutils.observers.pbrl import PbrlObserver
-from rlutils.rewards.interfaces import OracleInterface
 
 
 parser = argparse.ArgumentParser()
 parser.add_argument("task", type=str)
 parser.add_argument("oracle", type=str)
+parser.add_argument("--dynamics_version", type=int, default=1)
 parser.add_argument("--num_eps", type=int, default=100)
 parser.add_argument("--render_freq", type=int, default=0)
-parser.add_argument("--dynamics_version", type=int, default=1)
 args = parser.parse_args()
 
-P = build_params(["agent.pets=2", f"env.fastjet.{args.task}"], root_dir="config") # NOTE: PETS variant 2 as base parameters
+# NOTE: PETS variant 2 as base parameters
+P = build_params(
+    ["agent.pets=2", f"env.fastjet.{args.task}", f"oracle.fastjet.{args.task}.{args.oracle}"],
+    root_dir="config")
 
 # Create environment
 env = gym.make("FastJet-v0",
@@ -34,14 +35,9 @@ env = gym.make("FastJet-v0",
 )
 
 # Create PbrlObserver
-pbrl = PbrlObserver({
-    "reward_source": "oracle",
-    "observe_freq": 1,
-    "interface": {
-        "class": OracleInterface,
-        "oracle": importlib.import_module(f"config.oracle.fastjet.{args.task}.{args.oracle}").oracle
-    }
-})
+P["pbrl"]["reward_source"] = "oracle"
+P["pbrl"]["observe_freq"] = 1
+pbrl = PbrlObserver(P["pbrl"])
 
 # Create agent
 P["agent"]["pretrained_model"] = load(f"pretrained_dynamics/{args.task}_v{args.dynamics_version}.dynamics",
@@ -65,7 +61,7 @@ class CEMUpdater:
         return {}
 cem_updater = CEMUpdater()
 
-# Rollout and record episodes
+# Deploy and record episodes
 cem_updater.per_episode(-1)
 deploy(agent=agent, P={
         "num_episodes": args.num_eps,
