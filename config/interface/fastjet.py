@@ -1,28 +1,27 @@
-from vpython import canvas, label, slider, vector
+from vpython import canvas, label, slider, vector, dot
 import numpy as np
 from scipy.interpolate import interp1d
 
-from rlutils.observers.pbrl.interfaces import Interface
+from rlutils.rewards.interfaces import Interface
 from fastjet.env import FastJetEnv
 from fastjet.fast_jet import dir_to_vec, vec_to_dir
 
 
-STATE_DIM = 37
-ACTION_DIM = 4
-
 class FastJetInterface(Interface):
-    def __init__(self, pbrl, P): 
-        Interface.__init__(self, pbrl)
+    def __init__(self, graph, P):
+        Interface.__init__(self, graph)
 
     def __enter__(self):
         self.envs = []
         for e in range(2):
-            self.envs.append(FastJetEnv(task="target_easy", camera_angle="bbox"))
-            self.envs[e].jets[0].arrow_length = 20
+            # TODO: Need to use correct task?
+            self.envs.append(FastJetEnv(task="target_easy", camera_angle="outside_target_bg_skew", show_bbox=False))
+            # self.envs[e].jets[0].arrow_length = 20
             self.envs[e].render_mode = "human"
             self.envs[e].reset()
             self.envs[e].render(scene=canvas(width=900, height=600, align="right" if e == 0 else None))
-            self.envs[e].ep_num_label = label(canvas=self.envs[e].scene, text="", pixel_pos=True, pos=vector(50, self.envs[e].scene.height-50, 0), align="left", height=30)
+            self.envs[e].ep_num_label = label(canvas=self.envs[e].scene, text="", pixel_pos=True,
+                pos=vector(50, self.envs[e].scene.height-50, 0), align="left", height=30)
         self.envs.reverse() # Creation order puts self.envs[0] on the right by default
         self.envs[0].scene.bind("keydown", self.keydown)
         self.last_key = None
@@ -35,15 +34,12 @@ class FastJetInterface(Interface):
         for env in self.envs: env.close()
         self.slider.delete()
 
-    def __call__(self, i, j, n_interp=10):
-        tr_i, tr_j = self.pbrl.graph.nodes[i]["transitions"], self.pbrl.graph.nodes[j]["transitions"]
-        (T_i, d_i), (T_j, d_j) = tr_i.shape, tr_j.shape
-        assert d_i == d_j == 2*STATE_DIM + ACTION_DIM
-        # Add final next_state.
-        states = (np.vstack((tr_i[:,:STATE_DIM], tr_i[-1:,-STATE_DIM:])),
-                  np.vstack((tr_j[:,:STATE_DIM], tr_j[-1:,-STATE_DIM:])))
+    def __call__(self, i, j, n_interp=3):
+        # Gather states, adding final next_state
+        states = (np.vstack((self.graph.nodes[i]["states"], self.graph.nodes[i]["next_states"][-1:])),
+                  np.vstack((self.graph.nodes[j]["states"], self.graph.nodes[j]["next_states"][-1:])))
         # Extract pose information from states (use hdg, pitch, roll representation) and perform interpolation        
-        T = (T_i+1, T_j+1)
+        T = (len(states[0]), len(states[1]))
         poses = tuple((interp1d(range(T[e]), states_to_poses(s), axis=0, 
                 kind=
                 # "nearest" if e == 0 else # For debugging interpolation; set i = j for side-by-side comparison
@@ -65,23 +61,19 @@ class FastJetInterface(Interface):
                     if False: # Sense check at non-interpolated timesteps
                         if env.t % n_interp == 0:
                             idx = int(round(env.t / n_interp))
-                            # print(idx)
-                            x_or, y_or, z_or, _,_,_,_,_,_,_,_,_, fx, fy, fz, ux, uy, uz, _, tx_or, ty_or, tz_or, _,_,_,_,_,_,_,_,_, tfx, tfy, tfz, tux, tuy, tuz = states[e][idx]
-                            axis_or, up_or, taxis_or, tup_or = vector(fx, fy, fz), vector(ux, uy, uz), vector(tfx, tfy, tfz), vector(tux, tuy, tuz) 
+                            x_or, y_or, z_or, _,_,_,_,_,_,_,_,_, fx, fy, fz, ux, uy, uz, _, \
+                                tx_or, ty_or, tz_or, _,_,_,_,_,_,_,_,_, tfx, tfy, tfz, tux, tuy, tuz = states[e][idx]
+                            axis_or, up_or, taxis_or, tup_or = \
+                                vector(fx, fy, fz), vector(ux, uy, uz), vector(tfx, tfy, tfz), vector(tux, tuy, tuz)
                             pos_error = np.array([x, y, z, tx, ty, tz]) - np.array([x_or, y_or, z_or, tx_or, ty_or, tz_or])
-                            # print(pos_error)
                             assert np.isclose(pos_error, 0.0).all(), pos_error
                             dp = dot(axis, axis_or)
-                            # print(axis, axis_or, dp)
                             assert np.isclose(dp, 1.0)
                             dp = dot(up, up_or)
-                            # print(up, up_or, dp)
                             assert np.isclose(dp, 1.0)
                             dp = dot(taxis, taxis_or)
-                            # print(taxis, taxis_or, dp)
                             assert np.isclose(dp, 1.0)
                             dp = dot(tup, tup_or)
-                            # print(tup, tup_or, dp)
                             assert np.isclose(dp, 1.0)
                     env.jets[0]._set(pos=vector(x,y,z),      axis=axis,  up=up)
                     env.jets[1]._set(pos=vector(tx, ty, tz), axis=taxis, up=tup)
@@ -93,17 +85,18 @@ class FastJetInterface(Interface):
                 t = [0, 0] 
                 for env in self.envs: env.t = 0
             if self.last_key == "esc": return "esc" 
-            elif self.last_key == " ": return (1 - self.slider.value) 
+            elif self.last_key == " ": return (1. - self.slider.value)
 
     def keydown(self, ev): 
-        if ev.key == "left": self.slider.value = max(0, self.slider.value - 0.5)
-        elif ev.key == "right": self.slider.value = min(1, self.slider.value + 0.5)
+        if ev.key == "left": self.slider.value = max(0., self.slider.value - 0.5)
+        elif ev.key == "right": self.slider.value = min(1., self.slider.value + 0.5)
         self.last_key = ev.key
 
 
 def states_to_poses(states):
     poses = []
-    for x, y, z, _,_,_,_,_,_,_,_,_, fx, fy, fz, ux, uy, uz, _, tx, ty, tz, _,_,_,_,_,_,_,_,_, tfx, tfy, tfz, tux, tuy, tuz in states:
+    for x, y, z, _,_,_,_,_,_,_,_,_, fx, fy, fz, ux, uy, uz, _, \
+        tx, ty, tz, _,_,_,_,_,_,_,_,_, tfx, tfy, tfz, tux, tuy, tuz in states:
         h,  p,  r  = vec_to_dir(vector(fx, fy, fz),    vector(ux, uy, uz))
         th, tp, tr = vec_to_dir(vector(tfx, tfy, tfz), vector(tux, tuy, tuz))
         poses.append([x, y, z, tx, ty, tz, h, p, r, th, tp, tr])
