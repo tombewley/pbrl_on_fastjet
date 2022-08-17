@@ -3,7 +3,7 @@ from rlutils import make, deploy
 from rlutils.observers.pbrl import PbrlObserver
 from rlutils.common.featuriser import Featuriser
 import matplotlib.pyplot as plt
-from config.features.fastjet.default import *
+from config.features.fastjet import *
 
 f = Featuriser({"features": [
     los_error

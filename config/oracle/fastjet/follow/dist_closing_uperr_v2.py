@@ -1,5 +1,5 @@
 from rlutils.rewards.interfaces import OracleInterface
-from ....features.fastjet.default import *
+from ....features.fastjet import *
 
 def oracle(s, a, ns):
     d = dist(s, a, ns, None)

@@ -1,6 +1,6 @@
 from torch import abs
 from rlutils.rewards.interfaces import OracleInterface
-from ....features.fastjet.default import *
+from ....features.fastjet import *
 
 def oracle(s, a, ns):
     s, a, ns = preprocessor(s, a, ns) # NOTE: required to normalise attitude vectors

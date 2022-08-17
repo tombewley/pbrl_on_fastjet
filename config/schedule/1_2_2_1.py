@@ -1,7 +1,4 @@
 P = {
-    "deployment": {
-        "num_episodes": 2,
-    },
     "pbrl": {
         "feedback_budget": 1, 
         "observe_freq": 1,

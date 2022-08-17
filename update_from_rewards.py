@@ -1,7 +1,7 @@
 from torch import load
 from rlutils.rewards.interfaces import OracleInterface
 from rlutils.rewards.models import RewardNet, RewardTree
-from config.features.fastjet.default import P
+from config.features.fastjet.follow.default import P
 
 graph = load("offline_graphs/fastjet/follow/dist_closing_uperr_v2/0_100e_4950p.graph")
 
