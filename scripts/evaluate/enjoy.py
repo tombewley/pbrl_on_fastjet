@@ -14,15 +14,15 @@ parser = argparse.ArgumentParser()
 parser.add_argument("task", type=str)
 parser.add_argument("oracle", type=str)
 parser.add_argument("model", type=str)
+parser.add_argument("--pets_version", type=int, default=2)
 parser.add_argument("--dynamics_version", type=int, default=1)
 parser.add_argument("--num_eps", type=int, default=100)
 parser.add_argument("--render_freq", type=int, default=1)
 parser.add_argument("--wandb", type=int, default=0)
 args = parser.parse_args()
 
-# NOTE: PETS variant 2 as base parameters
 P = build_params(
-    ["agent.pets=2", f"env.fastjet.{args.task}", f"oracle.fastjet.{args.task}.{args.oracle}"],
+    [f"agent.pets={args.pets_version}", f"env.fastjet.{args.task}", f"oracle.fastjet.{args.task}.{args.oracle}"],
     root_dir="config")
 
 # Create environment
