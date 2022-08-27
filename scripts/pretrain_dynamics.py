@@ -10,6 +10,7 @@ from pprint import pprint
 
 parser = argparse.ArgumentParser()
 parser.add_argument("task", type=str)
+parser.add_argument("dynamics_version", type=int)
 parser.add_argument("--num_steps", type=int, default=int(1e5))
 parser.add_argument("--num_updates", type=int, default=int(1e5))
 args = parser.parse_args()
@@ -33,4 +34,4 @@ for i in range(int(args.num_updates)):
     print(i, mean(agent.ep_losses))
     del agent.ep_losses[:]
 
-agent.save(f"pretrained_dynamics/{args.task}_v1")
+agent.save(f"pretrained_dynamics/{args.task}_v{args.dynamics_version}")

@@ -5,15 +5,15 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 G_VEC = torch.tensor([0,9.81,0], device=device)
 
 def preprocessor(s, a, ns):
-    """Normalise fwd/up components for both ego and target to make them unit vectors."""
+    """Normalise fwd/up components for both ego and reference jets to make them unit vectors."""
     for low, high in ((12,15), (15,18), (31,34), (34,37)):
         s [...,low:high] /= torch.linalg.norm(s [...,low:high], axis=-1).unsqueeze(-1)
         ns[...,low:high] /= torch.linalg.norm(ns[...,low:high], axis=-1).unsqueeze(-1)
     return s, a, ns
 
-def cosim(v1, v2, dim):
+def cosim(v1, v2):
     # NOTE: Even though have normalised in preprocessor, numerical imprecision means have to clamp again
-    return torch.clamp(cosine_similarity(v1, v2, dim=dim), -1, 1)
+    return torch.clamp(cosine_similarity(v1, v2, dim=-1), -1, 1)
 
 # ============================
 def _fwd(s):                        return s[...,12:15]
@@ -50,20 +50,22 @@ def target_roll(s, a, ns, f):       return _fwd_up_to_roll(_target_fwd(ns), _tar
 def roll_error(s, a, ns, f):        return torch.abs(f["roll"] - f["target_roll"])
 def delta_roll_error(s, a, ns, f):  return f["roll_error"] - torch.abs(roll(None, None, s, None) - target_roll(None, None, s, None))
 
-# NOTE: Due to symmetry, no reason for absolute heading and target heading to be meaningful
+# NOTE: Due to symmetry, no reason for absolute heading and reference heading to be meaningful
+# TODO: THIS IS NOT THE CASE FOR LAND TASK
 def hdg_error(s, a, ns, f):         return torch.abs(torch.atan2(ns[...,14], ns[...,12]) - torch.atan2(ns[...,33], ns[...,31]))
 def delta_hdg_error(s, a, ns, f):   return f["hdg_error"] - hdg_error(None, None, s, None)
 
-def fwd_error(s, a, ns, f):         return torch.acos(cosim(_fwd(ns), _target_fwd(ns), dim=-1))
+def fwd_error(s, a, ns, f):         return torch.acos(cosim(_fwd(ns), _target_fwd(ns)))
 def delta_fwd_error(s, a, ns, f):   return f["fwd_error"] - fwd_error(None, None, s, None)
 
-def up_error(s, a, ns, f):          return torch.acos(cosim(_up(ns), _target_up(ns), dim=-1))
+def up_error(s, a, ns, f):          return torch.acos(cosim(_up(ns), _target_up(ns)))
 def delta_up_error(s, a, ns, f):    return f["up_error"] - up_error(None, None, s, None)
 
-def right_error(s, a, ns, f):       return torch.acos(cosim(torch.cross(_fwd(ns), _up(ns)), torch.cross(_target_fwd(ns), _target_up(ns)), dim=-1))
+def _target_right(s):               return torch.cross(_target_fwd(s), _target_up(s))
+def right_error(s, a, ns, f):       return torch.acos(cosim(torch.cross(_fwd(ns), _up(ns)), _target_right(ns)))
 def delta_right_error(s, a, ns, f): return f["right_error"] - right_error(None, None, s, None)
 
-def los_error(s, a, ns, f):         return torch.acos(cosim(_fwd(ns), _vec_to_target(ns), dim=-1)) # TODO: Make this direction-sensitive?
+def los_error(s, a, ns, f):         return torch.acos(cosim(_fwd(ns), _vec_to_target(ns))) # TODO: Make this direction-sensitive?
 def delta_los_error(s, a, ns, f):   return f["los_error"] - los_error(None, None, s, None)
 
 def abs_vel(s, a, ns, f):           return torch.linalg.norm(ns[...,3:6], axis=-1)
@@ -75,6 +77,8 @@ def thrust(s, a, ns, f):            return ns[...,18]
 def delta_thrust(s, a, ns, f):      return torch.abs(f["thrust"] - thrust(None, None, s, None))
 
 # TODO: Action rewards based on (absolute) demands
+
+def one(s, a, ns, f):               return torch.ones(s.shape[:-1])
 
 """
 STATE
@@ -97,24 +101,24 @@ STATE
 16 | ego.up.y
 17 | ego.up.z
 18 | ego.thrust
-19 | target.pos.x
-20 | target.pos.y
-21 | target.pos.z
-22 | target.vel.x
-23 | target.vel.y
-24 | target.vel.z
-25 | target.acc.x
-26 | target.acc.y
-27 | target.acc.z
-28 | target.r_vel.x,
-29 | target.r_vel.y,
-30 | target.r_vel.z,
-31 | target.axis.x, 
-32 | target.axis.y,
-33 | target.axis.z,
-34 | target.up.x,
-35 | target.up.y,
-36 | target.up.z
+19 | reference.pos.x
+20 | reference.pos.y
+21 | reference.pos.z
+22 | reference.vel.x
+23 | reference.vel.y
+24 | reference.vel.z
+25 | reference.acc.x
+26 | reference.acc.y
+27 | reference.acc.z
+28 | reference.r_vel.x,
+29 | reference.r_vel.y,
+30 | reference.r_vel.z,
+31 | reference.axis.x, 
+32 | reference.axis.y,
+33 | reference.axis.z,
+34 | reference.up.x,
+35 | reference.up.y,
+36 | reference.up.z
 ACTION
  0 | demanded_pitch
  1 | demanded_roll

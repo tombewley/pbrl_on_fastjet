@@ -15,7 +15,7 @@ class FastJetInterface(Interface):
         self.envs = []
         for e in range(2):
             # TODO: Need to use correct task?
-            self.envs.append(FastJetEnv(task="target_easy", camera_angle="outside_target_bg_skew", show_bbox=False))
+            self.envs.append(FastJetEnv(task="match", camera_angle="outside_parallel_skew", show_bbox=False))
             # self.envs[e].jets[0].arrow_length = 20
             self.envs[e].render_mode = "human"
             self.envs[e].reset()

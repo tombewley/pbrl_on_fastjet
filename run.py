@@ -7,13 +7,11 @@ from pprint import pprint
 import gym
 from torch import device, load
 from torch.cuda import is_available
-import wandb
 
 import rlutils
 import fastjet
 import holonav
 from rlutils.observers.pbrl import PbrlObserver
-from rlutils.observers.loggers import SumLogger
 from rlutils.common.env_wrappers import DoneWipeWrapper
 
 from config.base import P as base
@@ -26,6 +24,7 @@ if __name__ == "__main__":
     parser.add_argument("env", type=str)
     parser.add_argument("agent", type=str)
     parser.add_argument("num_eps", type=int)
+    parser.add_argument("--dynamics_version", type=int, default=2) # NOTE: For PETS only
 
     parser.add_argument("--oracle", type=str) # Will prepend env
     parser.add_argument("--human", type=int, default=0)
@@ -89,8 +88,9 @@ if __name__ == "__main__":
             P["agent"]["reward"] = pbrl.reward
             if P["agent"]["pretrained_model"]:
                 # NOTE: Loading pretrained model here
+                P["agent"]["dynamics_version"] = args.dynamics_version
                 P["agent"]["pretrained_model"] = load(
-                    f"pretrained_dynamics/{P['deployment']['task']}_v1.dynamics",
+                    f"pretrained_dynamics/{P['deployment']['task']}_v{args.dynamics_version}.dynamics",
                     map_location=device("cuda" if is_available() else "cpu"))
             if P["deployment"]["agent"] == "mbpo":
                 raise Exception("Link to MBPO rollouts not memory!")
