@@ -12,6 +12,6 @@ P = {
             "oracle": oracle
         },
         "save_path": "graphs_and_models/fastjet/follow/dist_closing_uperr_v2",
-        "offline_graph_path": "offline_graphs/fastjet/follow/dist_closing_uperr_v2/0_100e_4950p.graph"
+        "offline_graph_path": "offline_graphs/fastjet/follow/dist_closing_uperr_v2/1_200e_1000p.graph"
     }
 }

@@ -1,10 +1,10 @@
 from torch.linalg import norm
-from fastjet.tasks.match import CONFIG
+from fastjet.tasks.match import TERMINATION_RADIUS
 
 SKIP_FRAMES = 25
 
 def termination(_, __, next_states):
-    return norm(next_states[...,0:3] - next_states[...,19:22], axis=-1) < CONFIG["radius"]
+    return norm(next_states[...,0:3] - next_states[...,19:22], axis=-1) < TERMINATION_RADIUS
 
 P = {
     "deployment": {
@@ -16,5 +16,10 @@ P = {
     },
     "agent": {
         "termination": termination
+    },
+    "pbrl": {
+        "model": {
+            "negative_rewards": True
+        }
     }
 }

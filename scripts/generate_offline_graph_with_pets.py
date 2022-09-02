@@ -3,6 +3,7 @@ Use PETS with a pretrained dynamics model to generate an offline dataset
 for fidelity evaluation.
 """
 
+from ast import Or
 import os
 import argparse
 import gym, fastjet
@@ -11,13 +12,17 @@ from torch.cuda import is_available
 from random import randint
 from rlutils import build_params, make, deploy
 from rlutils.observers.pbrl import PbrlObserver
+from rlutils.rewards.sampler import Sampler
+from rlutils.rewards.interfaces import OracleInterface
+from rlutils.rewards.interactions import preference_batch
 
 
 parser = argparse.ArgumentParser()
 parser.add_argument("task", type=str)
 parser.add_argument("oracle", type=str)
-parser.add_argument("--dynamics_version", type=int, default=1)
-parser.add_argument("--num_eps", type=int, default=100)
+parser.add_argument("--dynamics_version", type=int, default=2)
+parser.add_argument("--num_eps", type=int, default=200)
+parser.add_argument("--num_preferences", type=int, default=1000)
 parser.add_argument("--render_freq", type=int, default=0)
 args = parser.parse_args()
 
@@ -71,10 +76,13 @@ deploy(agent=agent, P={
     }
 )
 
-# Consult the oracle to create a fully-connected preference graph
-for i in range(args.num_eps):
-    for j in range(i):
-        pbrl.graph.add_preference(i, j, pbrl.interface(i, j))
+# Collect a single preference batch at the end with uniform sampling.
+sampler = Sampler(pbrl.graph, model=None, P={
+        "weight": "uniform",
+        "recency_constraint": False,
+        "probabilistic": True
+})
+preference_batch(sampler, pbrl.interface, pbrl.graph, args.num_preferences)
 print(pbrl.graph)
 
 # Save out, ensuring no overwriting by incrementing index

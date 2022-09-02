@@ -16,7 +16,7 @@ P = {
             "class": OracleInterface,
             "oracle": oracle
         },
-        "save_path": "graphs_and_models/fastjet/chase/dist20_los_roll_alt100",
-        "offline_graph_path": "offline_graphs/fastjet/chase/dist20_los_roll_alt100/0_100e_4950p.graph"
+        "save_path": "graphs_and_models/fastjet/chase/dist20_los_roll_alt50",
+        "offline_graph_path": "offline_graphs/fastjet/chase/dist20_los_roll_alt50/1_200e_1000p.graph"
     }
 }

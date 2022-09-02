@@ -1,3 +1,4 @@
+raise Exception("IS UNIFORM BETTER?")
 P = {
     "pbrl": {
         "sampler": {

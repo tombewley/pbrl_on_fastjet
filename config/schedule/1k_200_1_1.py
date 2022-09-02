@@ -1,6 +1,6 @@
 P = {
     "pbrl": {
-        "feedback_budget": 10000, 
+        "feedback_budget": 1000, 
         "observe_freq": 1,
         "feedback_freq": 1,
         "feedback_period": 200,

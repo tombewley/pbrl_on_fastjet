@@ -13,5 +13,10 @@ P = {
     },
     "agent": {
         "termination": termination
+    },
+    "pbrl": {
+        "model": {
+            "negative_rewards": False
+        }
     }
 }
