@@ -5,7 +5,7 @@
 #SBATCH --gres=gpu:2
 #SBATCH --partition gpu
 #SBATCH --time=10:00:00
-#SBATCH --array=0-11
+#SBATCH --array=0-8
 
 PARAMS=(
     "fastjet.match pets=2 200 --wandb=1 --group=robustness_pets_match --oracle=dist_pose_when_close --features=default --sampler=uniform_recency --schedule=1k_200_1_1 --model=tree=10"
