@@ -9,12 +9,12 @@ P = {
         "model_freq": 0,
         "rollout": {"horizon_params": ("constant", 10)},
         "gamma": 1,
-        #                    0      1       2       3       4
-        "cem_iterations":   [50,    10,     50,     10,     100,  ],
-        "cem_particles":    [60,    20,     60,     20,     100,  ],
-        "cem_elites":       [15,    5,      15,     5,      20,   ],
-        "cem_warm_start":   [False, False,  True,   True,   True, ],
-        "cem_alpha":        [0.5,   0.5,    0.5,    0.5,    0.3,  ],
-        "cem_temperature":  [0.,    0.,     0.5,    0.5,    0.5,  ]
+        #                    0      1      2     3     4     5
+        "cem_iterations":   [50,    10,    50,   10,   100,  5,    ],
+        "cem_particles":    [60,    20,    60,   20,   100,  10,   ],
+        "cem_elites":       [15,    5,     15,   5,    20,   3,    ],
+        "cem_warm_start":   [False, False, True, True, True, True, ],
+        "cem_alpha":        [0.5,   0.5,   0.5,  0.5,  0.3,  0.5,  ],
+        "cem_temperature":  [0.,    0.,    0.5,  0.5,  0.5,  0.5,  ]
     }
 }
