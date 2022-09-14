@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=pbrl_land200
 #SBATCH --nodes=1
-#SBATCH --partition cpu
+#SBATCH --partition veryshort
 #SBATCH --time=4:00:00
 
 source activate env_pytorch
