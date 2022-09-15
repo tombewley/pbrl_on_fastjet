@@ -1,7 +1,7 @@
 SKIP_FRAMES = 25
 
 def termination(_, __, next_states):
-    return next_states[...,1] <= 0.5
+    return next_states[...,0] >= 100
 
 P = {
     "deployment": {
@@ -16,7 +16,7 @@ P = {
     },
     "pbrl": {
         "model": {
-            "negative_rewards": False
+            "negative_rewards": True
         }
     }
 }
