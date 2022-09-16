@@ -41,7 +41,7 @@ def load_and_deploy(task, oracle, model, pets_version, dynamics_version,
         P["pbrl"]["reward_source"] = "oracle"
     else:
         P["pbrl"]["reward_source"] = "model"
-        pbrl.model = load(f"graphs_and_models/fastjet/{task}/{oracle}/{model}.reward", map_location=device_)
+        pbrl.model = load(f"final_graphs_and_models/fastjet/{task}/{oracle}/{model}.reward", map_location=device_)
         pbrl.model.device = device_
 
     # Create agent
