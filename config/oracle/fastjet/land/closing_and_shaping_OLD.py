@@ -37,6 +37,6 @@ P = {
             "oracle": oracle
         },
         "save_path": "graphs_and_models/fastjet/land/closing_and_shaping",
-        "offline_graph_path": "offline_graphs/fastjet/land/closing_and_shaping/0_200e_1000p.graph"
+        "offline_graph_path": "offline_graphs/fastjet/land/closing_and_shaping/0_200e_1000p_OLD.graph"
     }
 }
