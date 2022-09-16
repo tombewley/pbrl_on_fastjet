@@ -32,7 +32,7 @@ else:
                                        args.num_eps, render_freq=0, explain_freq=0, random_agent=False)
 
     # Deploy an agent with each model and concatenate returns by subdirectory
-    path = f"graphs_and_models/fastjet/{args.task}/{args.oracle}"
+    path = f"final_graphs_and_models/fastjet/{args.task}/{args.oracle}"
     for subdir in os.listdir(path):
         graphs[subdir] = {}
         for run in os.listdir(f"{path}/{subdir}"):
