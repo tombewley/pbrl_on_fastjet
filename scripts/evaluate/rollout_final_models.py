@@ -40,7 +40,7 @@ else:
             print(name)
             graphs[subdir][run] = load_and_deploy(args.task, args.oracle, name, args.pets_version, args.dynamics_version,
                                                   args.num_eps, render_freq=0, explain_freq=0, random_agent=False)
-    save(graphs, save_path)
+            save(graphs, save_path) # Checkpoint save
 
 lo =  percentile(graphs["random"].oracle_returns, 50)
 rng = percentile(graphs["oracle"].oracle_returns, 50) - lo
