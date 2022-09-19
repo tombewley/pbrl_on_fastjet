@@ -33,7 +33,7 @@ def oracle(s, a, ns):
            0.025 * thrust_ + \
            0.05  * delta_thrust(s, a, ns, {"thrust": thrust_}) + \
 
-           10.   * (alt(s, a, ns, None) < 0.5)
+           10.   * (alt(s, a, ns, None) < 0.6)
     )
 
 P = {
