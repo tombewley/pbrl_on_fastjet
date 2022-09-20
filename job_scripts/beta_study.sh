@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=pbrl_beta_study
 #SBATCH --nodes=1
-#SBATCH --partition cpu
+#SBATCH --partition veryshort
 #SBATCH --time=5:00:00
 #SBATCH --array=0-19
 
