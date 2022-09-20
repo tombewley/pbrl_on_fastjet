@@ -32,6 +32,7 @@ if __name__ == "__main__":
     parser.add_argument("--features", type=str) # Will prepend env
     parser.add_argument("--schedule", type=str)
     parser.add_argument("--sampler", type=str)
+    parser.add_argument("--irrationality", type=str)
 
     parser.add_argument("--render_freq", type=int, default=0)
     parser.add_argument("--save_freq", type=int, default=0)
@@ -59,7 +60,8 @@ if __name__ == "__main__":
         f"model.{args.model}" if args.model is not None else "",
         f"features.{args.env}.{args.features}" if args.features is not None else "",
         f"schedule.{args.schedule}" if args.schedule is not None else "",
-        f"sampler.{args.sampler}" if args.sampler is not None else ""
+        f"sampler.{args.sampler}" if args.sampler is not None else "",
+        f"irrationality.{args.irrationality}" if args.irrationality is not None else ""
         ], base, root_dir="config")
     pprint(P)
 
