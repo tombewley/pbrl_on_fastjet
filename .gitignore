@@ -4,6 +4,7 @@ PilotData/
 agents/
 demos/
 final_graphs_and_models/
+final_model_rollout_graphs/
 graphs_and_models/
 logs/
 notebooks/
