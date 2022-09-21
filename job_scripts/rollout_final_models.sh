@@ -4,13 +4,14 @@
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:2
 #SBATCH --partition gpu
-#SBATCH --time=12:00:00
-#SBATCH --array=0-2
+#SBATCH --time=24:00:00
+#SBATCH --array=0-3
 
 PARAMS=(
     "match dist_pose_when_close"
     "follow dist_closing_uperr_v2"
     "chase dist20_los_roll_alt50"
+    "land closing_and_shaping"
 )
 
 module load CUDA
