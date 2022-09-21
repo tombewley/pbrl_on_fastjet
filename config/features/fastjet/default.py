@@ -8,7 +8,7 @@ P = {
                 "features": [
                     dist,
                     closing_speed,
-                    # alt,
+                    alt,
                     # target_alt,
                     alt_error,
                     delta_alt_error,
