@@ -2,8 +2,9 @@
 
 #SBATCH --job-name=pbrl_N_max_study
 #SBATCH --nodes=1
-#SBATCH --partition veryshort
-#SBATCH --time=6:00:00
+#SBATCH --gres=gpu:2
+#SBATCH --partition gpu
+#SBATCH --time=10:00:00
 #SBATCH --array=0-23
 
 PARAMS=(
