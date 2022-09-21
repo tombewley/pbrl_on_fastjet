@@ -34,7 +34,7 @@ def closing_speed(s, a, ns, f):     return f["dist"] - dist(None, None, s, None)
 def alt(s, a, ns, f):               return ns[...,1]
 def target_alt(s, a, ns, f):        return ns[...,20]
 # def alt_error(s, a, ns, f):         return torch.abs(f["alt"] - f["target_alt"])
-def alt_error(s, a, ns, f):         return torch.abs(f["alt"] - target_alt(s, a, ns, f))
+def alt_error(s, a, ns, f):         return torch.abs(alt(s, a, ns, f) - target_alt(s, a, ns, f))
 def delta_alt_error(s, a, ns, f):   return f["alt_error"] - torch.abs(alt(None, None, s, None) - target_alt(None, None, s, None))
 
 def dist_xz(s, a, ns, f):           return (((ns[...,0] - ns[...,19])**2) + ((ns[...,2] - ns[...,21])**2))**0.5
