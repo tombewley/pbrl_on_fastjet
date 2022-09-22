@@ -26,17 +26,16 @@ if os.path.exists(save_path):
 else:
     # Evaluate random and oracle as lower and upper bounds
     graphs = {}
-    # print("Random")
-    # graphs["random"] = load_and_deploy(args.task, args.oracle, None, args.pets_version, args.dynamics_version,
-    #                                    args.num_eps, render_freq=0, explain_freq=0, random_agent=True)
-    # print("Oracle")
-    # graphs["oracle"] = load_and_deploy(args.task, args.oracle, None, args.pets_version, args.dynamics_version,
-    #                                    args.num_eps, render_freq=0, explain_freq=0, random_agent=False)
+    print("Random")
+    graphs["random"] = load_and_deploy(args.task, args.oracle, None, args.pets_version, args.dynamics_version,
+                                       args.num_eps, render_freq=0, explain_freq=0, random_agent=True)
+    print("Oracle")
+    graphs["oracle"] = load_and_deploy(args.task, args.oracle, None, args.pets_version, args.dynamics_version,
+                                       args.num_eps, render_freq=0, explain_freq=0, random_agent=False)
 
     # Deploy an agent with each model and concatenate returns by subdirectory
     path = f"final_graphs_and_models/fastjet/{args.task}/{args.oracle}"
     for subdir in os.listdir(path):
-        if subdir != "net": continue
         graphs[subdir] = {}
         for run in os.listdir(f"{path}/{subdir}"):
             name = f"{subdir}/{run}/0200"
@@ -45,18 +44,18 @@ else:
                                                   args.num_eps, render_freq=0, explain_freq=0, random_agent=False)
             save(graphs, save_path) # Checkpoint save
 
-# hi = percentile(graphs["oracle"].oracle_returns, 50)
-# rng =  hi - percentile(graphs["random"].oracle_returns, 50)
+hi = percentile(graphs["oracle"].oracle_returns, 50)
+rng =  hi - percentile(graphs["random"].oracle_returns, 50)
 
-# for k, v in graphs.items():
-#     if type(v) == dict:
-#         print(f"{k}:")
-#         all_regret_norm = []
-#         for kk, vv in v.items():
-#             regret_norm = (hi - array(vv.oracle_returns)) / rng
-#             all_regret_norm += list(regret_norm)
-#             print(f"  {kk}:".ljust(30), percentile(regret_norm, [25,50,75]))
-#         print(f"  ALL:".ljust(30), percentile(all_regret_norm, [25,50,75]))
-#     else:
-#         regret_norm = (hi - array(v.oracle_returns)) / rng
-#         print(f"{k}:".ljust(30), percentile(regret_norm, [25,50,75]))
+for k, v in graphs.items():
+    if type(v) == dict:
+        print(f"{k}:")
+        all_regret_norm = []
+        for kk, vv in v.items():
+            regret_norm = (hi - array(vv.oracle_returns)) / rng
+            all_regret_norm += list(regret_norm)
+            print(f"  {kk}:".ljust(30), percentile(regret_norm, [25,50,75]))
+        print(f"  ALL:".ljust(30), percentile(all_regret_norm, [25,50,75]))
+    else:
+        regret_norm = (hi - array(v.oracle_returns)) / rng
+        print(f"{k}:".ljust(30), percentile(regret_norm, [25,50,75]))
