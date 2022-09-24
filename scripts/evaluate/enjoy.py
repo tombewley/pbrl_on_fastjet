@@ -1,7 +1,6 @@
 """
 Deploy PETS with a pretrained dynamics model and a learnt reward model.
 """
-
 import argparse
 from torch import device, load
 from torch.cuda import is_available
@@ -10,7 +9,7 @@ from rlutils import build_params, make, deploy
 from rlutils.observers.pbrl import PbrlObserver
 
 
-def load_and_deploy(task, oracle, model, pets_version, dynamics_version,
+def load_and_deploy(task, oracle, run, pets_version, dynamics_version,
                          num_eps, render_freq, explain_freq, random_agent):
     P = build_params(
         [f"agent.pets={pets_version}", f"env.fastjet.{task}", f"oracle.fastjet.{task}.{oracle}"],
@@ -21,8 +20,8 @@ def load_and_deploy(task, oracle, model, pets_version, dynamics_version,
         "show": True,
         "freq": explain_freq,
         "plots": [
-            "leaf_visitation_heatmap",
-            "leaf_visitation_time_series",
+            # "leaf_visitation_heatmap",
+            # "leaf_visitation_time_series",
         ]
     } if explain_freq else {}
 
@@ -37,11 +36,11 @@ def load_and_deploy(task, oracle, model, pets_version, dynamics_version,
     # Create PbrlObserver
     pbrl = PbrlObserver(P["pbrl"])
     device_ = device("cuda" if is_available() else "cpu")
-    if model is None:
+    if run is None:
         P["pbrl"]["reward_source"] = "oracle"
     else:
         P["pbrl"]["reward_source"] = "model"
-        pbrl.model = load(f"final_graphs_and_models/fastjet/{task}/{oracle}/{model}.reward", map_location=device_)
+        pbrl.model = load(f"final_graphs_and_models/fastjet/{task}/{oracle}/{run}.reward", map_location=device_)
         pbrl.model.device = device_
 
     # Create agent
@@ -67,12 +66,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("task", type=str)
     parser.add_argument("oracle", type=str)
-    parser.add_argument("model", type=str)
+    parser.add_argument("--run", type=str, default=None)
     parser.add_argument("--pets_version", type=int, default=2)
     parser.add_argument("--dynamics_version", type=int, default=2)
     parser.add_argument("--num_eps", type=int, default=100)
     parser.add_argument("--render_freq", type=int, default=1)
     parser.add_argument("--explain_freq", type=int, default=1)
     args = parser.parse_args()
-    load_and_deploy(args.task, args.oracle, args.model, args.pets_version, args.dynamics_version,
+    load_and_deploy(args.task, args.oracle, args.run, args.pets_version, args.dynamics_version,
                     args.num_eps, args.render_freq, args.explain_freq, random_agent=False)

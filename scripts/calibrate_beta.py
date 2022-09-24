@@ -2,11 +2,10 @@
 Calibrate oracle noise parameter beta on a per-task basis.
 """
 import argparse
-from numpy import array
-from scipy.spatial.distance import pdist
 import torch
 from torch.cuda import is_available
-import matplotlib.pyplot as plt
+from numpy import array
+from scipy.spatial.distance import pdist
 from rlutils import build_params
 
 

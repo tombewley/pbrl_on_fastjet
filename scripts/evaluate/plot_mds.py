@@ -6,7 +6,7 @@ import os
 import argparse
 from torch import device, load
 from torch.cuda import is_available
-from numpy import array, percentile
+from numpy import percentile
 from networkx import draw
 import matplotlib.pyplot as plt
 from rlutils import build_params
@@ -33,7 +33,7 @@ oracle = P["pbrl"]["interface"]["oracle"]
 preference_graph = load(P["pbrl"]["offline_graph_path"], map_location=device_)
 preference_graph.device = device_
 
-rollout_graphs = load(f"final_model_rollout_graphs/{args.task}-{args.oracle}.graphs")
+rollout_graphs = load(f"final_model_rollout_graphs/fastjet/{args.task}/{args.oracle}/500e_0p.graphs", map_location=device_)
 lo =  percentile(rollout_graphs["random"].oracle_returns, 50)
 rng = percentile(rollout_graphs["oracle"].oracle_returns, 50) - lo
 
@@ -42,10 +42,7 @@ reward_functions, names, regret_reductions = [oracle], ["oracle"], [1.]
 for subdir in os.listdir(path):
     for run in os.listdir(f"{path}/{subdir}"):
         name = f"{subdir}/{run}"
-        print(name)
-        try:
-            model = load(f"{path}/{name}/0200.reward", map_location=device_)
-        except: print("SKIPPED"); continue
+        model = load(f"{path}/{name}/0200.reward", map_location=device_)
         model.device = device_
         reward_functions.append(model)
         names.append(name)
@@ -58,6 +55,9 @@ elif args.metric == "return_correlation":
 elif args.metric == "rank_correlation":
     corr = rank_correlation(preference_graph, reward_functions)
 else: raise NotImplementedError
+
+for i, name in enumerate(names):
+    print(f"{name.ljust(40)}: {corr[i,0]}")
 
 g = graph(corr_to_dist(corr))
 pos = mds_graph_layout(g)
