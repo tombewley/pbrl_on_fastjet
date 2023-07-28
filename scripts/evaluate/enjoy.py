@@ -4,7 +4,8 @@ Deploy PETS with a pretrained dynamics model and a learnt reward model.
 import argparse
 from torch import device, load
 from torch.cuda import is_available
-import gym, fastjet
+import gymnasium as gym
+import fastjet
 from rlutils import build_params, make, deploy
 from rlutils.observers.pbrl import PbrlObserver
 
@@ -49,7 +50,7 @@ def load_and_deploy(task, oracle, run, pets_version, dynamics_version,
     else:
         P["agent"]["pretrained_model"] = load(f"pretrained_dynamics/{task}_v{dynamics_version}.dynamics",
                                               map_location=device_)
-        P["agent"]["reward"] = pbrl.reward
+        P["agent"]["reward_function"] = pbrl.reward
         agent = make("pets", env, hyperparameters=P["agent"])
 
     # Deploy

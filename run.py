@@ -87,7 +87,7 @@ if __name__ == "__main__":
         print(f"Loaded {fname}")
     else:
         if P["deployment"]["agent"] in {"steve", "pets", "mbpo"}:
-            P["agent"]["reward"] = pbrl.reward
+            P["agent"]["reward_function"] = pbrl.reward
             if P["agent"]["pretrained_model"]:
                 # NOTE: Loading pretrained model here
                 P["agent"]["dynamics_version"] = args.dynamics_version

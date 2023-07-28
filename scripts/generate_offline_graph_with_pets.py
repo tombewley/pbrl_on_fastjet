@@ -47,7 +47,7 @@ pbrl = PbrlObserver(P["pbrl"])
 # Create agent
 P["agent"]["pretrained_model"] = load(f"pretrained_dynamics/{args.task}_v{args.dynamics_version}.dynamics",
                                       map_location=device("cuda" if is_available() else "cpu"))
-P["agent"]["reward"] = pbrl.reward
+P["agent"]["reward_function"] = pbrl.reward
 agent = make("pets", env, hyperparameters=P["agent"])
 
 # Define class for randomising the CEM parameters on each episode
