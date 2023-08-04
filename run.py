@@ -4,7 +4,7 @@ Script for running preference-based reinforcement learning.
 
 import argparse
 from pprint import pprint
-import gym
+import gymnasium as gym
 from torch import device, load
 from torch.cuda import is_available
 
@@ -70,7 +70,7 @@ if __name__ == "__main__":
             task=P["deployment"]["task"],
             continuous=(P["deployment"]["agent"] != "dqn"),
             skip_frames=P["deployment"]["skip_frames"],
-            render_mode=("human" if args.render_freq > 0 else False),
+            render_mode=("human" if args.render_freq > 0 else None),
             camera_angle=P["deployment"]["camera_angle"]
         )
     else:
